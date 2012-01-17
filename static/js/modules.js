@@ -209,18 +209,19 @@ module.exports = ext.register("ext/filesystem/filesystem", {
         }
 
         function openHandler(e) {
+            /* Replace with AJAX function
             ide.socket.send(JSON.stringify({
                 command: "internal-isfile",
                 argv: e.data.argv,
                 cwd: e.data.cwd,
                 sender: "filesystem"
-            }));
+            }));*/
             return false;
         }
         ide.addEventListener("consolecommand.open", openHandler);
         ide.addEventListener("consolecommand.c9",   openHandler);
 
-        ide.addEventListener("consoleresult.internal-isfile", function(e) {
+        /*ide.addEventListener("consoleresult.internal-isfile", function(e) {
             var data = e.data;
             if (data.sender != "filesystem")
                 return;
@@ -229,7 +230,7 @@ module.exports = ext.register("ext/filesystem/filesystem", {
                 require("ext/debugger/debugger").showFile(path);
             else
                 require("ext/console/console").log("'" + path + "' is not a file.");
-        });
+        }); - Part of the openHandler function above */
 
         /*this.model.insert(url, {
             insertPoint : this.model.queryNode("folder[@root='1']")
@@ -3916,7 +3917,7 @@ module.exports = ext.register("ext/debugger/debugger", {
             caption : this.name
         }));*/
 
-        ide.addEventListener("consolecommand.debug", function(e) {
+        /*ide.addEventListener("consolecommand.debug", function(e) {
             ide.socket.send(JSON.stringify({
                 command: "internal-isfile",
                 argv: e.data.argv,
@@ -3938,7 +3939,7 @@ module.exports = ext.register("ext/debugger/debugger", {
             else {
                 require("ext/console/console").log("'" + path + "' is not a file.");
             }
-        });
+        });*/
         
         panels.register(this);
     },
@@ -4228,7 +4229,7 @@ module.exports = ext.register("ext/noderunner/noderunner", {
     },
 
     init : function(amlNode){
-        ide.addEventListener("socketDisconnect", this.onDisconnect.bind(this));
+        /*ide.addEventListener("socketDisconnect", this.onDisconnect.bind(this));
         ide.addEventListener("socketMessage", this.onMessage.bind(this));
 
         dbgNode.addEventListener("onsocketfind", function() {
@@ -4260,7 +4261,7 @@ module.exports = ext.register("ext/noderunner/noderunner", {
             else {
                 require("ext/console/console").log("'" + path + "' is not a file.");
             }
-        });
+        });*/
     },
 
     $onDebugProcessActivate : function() {
@@ -4323,7 +4324,7 @@ module.exports = ext.register("ext/noderunner/noderunner", {
             "command" : "RunDebugChrome",
             "file"    : ""
         };
-        ide.socket.send(JSON.stringify(command));
+        /*ide.socket.send(JSON.stringify(command));*/
     },
 
     debug : function() {
@@ -4343,7 +4344,7 @@ module.exports = ext.register("ext/noderunner/noderunner", {
                 "C9_SELECTED_FILE": page ? page.getAttribute("path").slice(ide.davPrefix.length) : ""
             }
         };
-        ide.socket.send(JSON.stringify(command));
+        /*ide.socket.send(JSON.stringify(command));*/
 
         log.clear();
         log.showOutput();
@@ -4360,7 +4361,7 @@ module.exports = ext.register("ext/noderunner/noderunner", {
             return
 
         require("ext/debugger/debugger").disable();
-        ide.socket.send(JSON.stringify({"command": "kill"}));
+        /*ide.socket.send(JSON.stringify({"command": "kill"}));*/
     },
 
     enable : function(){
@@ -4896,11 +4897,11 @@ module.exports = ext.register("ext/console/console", {
         --cursorPos;
 
         if (!cmdFetched) {
-            ide.socket.send(JSON.stringify({
+            /*ide.socket.send(JSON.stringify({
                 command: "commandhints",
                 argv: parser.argv,
                 cwd: this.getCwd()
-            }));
+            }));*/
         }
 
         if (typeof parser.argv[0] != "string")
@@ -4995,14 +4996,14 @@ module.exports = ext.register("ext/console/console", {
             if (ins.indexOf("PATH]") != -1 && lastSearch && lastSearch.line == val && lastSearch.matches.length == 1)
                 ins = lastSearch.matches[0].replace(lastSearch.base, "");
             if (ins.indexOf("PATH]") != -1) {
-                ide.socket.send(JSON.stringify({
+                /*ide.socket.send(JSON.stringify({
                     command: "internal-autocomplete",
                     line   : val,
                     textbox: textbox.id,
                     cursor : cursorPos,
                     argv   : parser.argv,
                     cwd    : this.getCwd()
-                }));
+                }));*/
             }
             else {
                 if (!!(cmds || commands)[base + ins])
@@ -5772,20 +5773,20 @@ module.exports = ext.register("ext/watcher/watcher", {
             
         function sendWatchFile(path) {
             // console.log("Sending watchFile message for file " + path);
-            ide.socket.send(JSON.stringify({
+            /*ide.socket.send(JSON.stringify({
                 "command"     : "watcher",
                 "type"        : "watchFile",
                 "path"        : path
-            }));
+            }));*/
         }
         
         function sendUnwatchFile(path) {
             // console.log("Sending unwatchFile message for file " + path);
-            ide.socket.send(JSON.stringify({
+            /*ide.socket.send(JSON.stringify({
                 "command"     : "watcher",
                 "type"        : "unwatchFile",
                 "path"        : path
-            }));
+            }));*/
         }           
        
         function checkPage() {
@@ -5872,7 +5873,7 @@ module.exports = ext.register("ext/watcher/watcher", {
             }
         }
         
-        stServerConnected.addEventListener("activate", function() {
+        /*stServerConnected.addEventListener("activate", function() {
             var pages = tabEditors.getPages();
             
             pages.forEach(function (page) {
@@ -5946,7 +5947,7 @@ module.exports = ext.register("ext/watcher/watcher", {
         
         tabEditors.addEventListener("afterswitch", function(e) {
             checkPage();
-        });
+        });*/
     },
 });
 

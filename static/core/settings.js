@@ -26,6 +26,8 @@ module.exports = {
     },
     
     saveToFile : function() {
+        /*
+        Here we need to add a function that submits this data via a post request.
         if (ide.onLine) {
             ide.send(JSON.stringify({
                 command: "settings",
@@ -33,7 +35,7 @@ module.exports = {
                 settings: this.model.data && apf.xmldb.cleanXml(this.model.data.xml) || ""
             }));
         }
-        else if (this.model.data) {
+        else*/ if (this.model.data) {
             localStorage[this.sIdent] = apf.xmldb.cleanXml(this.model.data.xml) || "";
         }
     },
@@ -103,6 +105,8 @@ module.exports = {
             xml = apf.IdeSettings;
         
         if (!xml) {
+            /*
+            Needs replacing with an AJAX function
             ide.addEventListener("socketMessage", function(e){
                 if (e.message.type == "settings") {
                     var settings = e.message.settings;
@@ -116,7 +120,7 @@ module.exports = {
             });
             
             if (ide.onLine === true)
-                ide.send(JSON.stringify({command: "settings", action: "get"}));
+                ide.send(JSON.stringify({command: "settings", action: "get"}));*/
             return;
         }
 
