@@ -28,7 +28,7 @@ module.exports = ext.register("ext/gitblame/gitblame", {
     hook : function(){
         var _self = this;
 
-        ide.addEventListener("socketMessage", this.onMessage.bind(this));
+        /*ide.addEventListener("socketMessage", this.onMessage.bind(this));*/
 
         tabEditors.addEventListener("beforeswitch", function(e){
             if (editors.currentEditor) {
@@ -71,7 +71,7 @@ module.exports = ext.register("ext/gitblame/gitblame", {
                     );
                 }
                 else {
-                    ide.send(JSON.stringify(data));
+                    /*ide.send(JSON.stringify(data));*/
                     // Set gutter width
                     editors.currentEditor.ceEditor.$editor.renderer.setGutterWidth("300px");
                 }

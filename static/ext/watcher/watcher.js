@@ -33,19 +33,19 @@ module.exports = ext.register("ext/watcher/watcher", {
             _self               = this;
             
         function sendWatchFile(path) {
-            ide.send(JSON.stringify({
+            /*ide.send(JSON.stringify({
                 "command"     : "watcher",
                 "type"        : "watchFile",
                 "path"        : path.slice(ide.davPrefix.length).replace(/^\//, "")
-            }));
+            }));*/
         }
         
         function sendUnwatchFile(path) {
-            ide.send(JSON.stringify({
+            /*ide.send(JSON.stringify({
                 "command"     : "watcher",
                 "type"        : "unwatchFile",
                 "path"        : path.slice(ide.davPrefix.length).replace(/^\//, "")
-            }));
+            }));*/
         }           
        
         function checkPage() {

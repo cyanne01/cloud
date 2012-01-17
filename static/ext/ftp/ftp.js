@@ -34,7 +34,7 @@ module.exports = ext.register("ext/ftp/ftp", {
         if (window.dockPanelRight)
             dockPanelRight.setAttribute("visible", false);
 
-        ide.addEventListener("socketMessage", this.onMessage.bind(this));
+        /*ide.addEventListener("socketMessage", this.onMessage.bind(this));*/
     },
 
     init: function(amlNode) {

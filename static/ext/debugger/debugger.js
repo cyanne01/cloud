@@ -42,7 +42,7 @@ module.exports = ext.register("ext/debugger/debugger", {
     hook : function(){
         var _self = this;
         
-        ide.addEventListener("consolecommand.debug", function(e) {
+        /*ide.addEventListener("consolecommand.debug", function(e) {
             ide.send(JSON.stringify({
                 command: "internal-isfile",
                 argv: e.data.argv,
@@ -50,7 +50,7 @@ module.exports = ext.register("ext/debugger/debugger", {
                 sender: "debugger"
             }));
             return false;
-        });
+        });*/
         
         ide.addEventListener("loadsettings", function (e) {
             // restore the breakpoints from the IDE settings

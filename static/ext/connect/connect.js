@@ -17,8 +17,8 @@ module.exports = ext.register("ext/connect/connect", {
     deps        : [],
     
     init : function(){
-        ide.onLine = -1;
-        ide.addEventListener("socketConnect", function(e){
+        ide.onLine = true;
+        /*ide.addEventListener("socketConnect", function(e){
             ide.onLine = true;
 
             ide.dispatchEvent("beforeonline");
@@ -36,7 +36,7 @@ module.exports = ext.register("ext/connect/connect", {
             
             stServerConnected.deactivate();
             winReconnect.show();
-        });
+        });*/
     },
     
     enable : function(){

@@ -52,7 +52,7 @@ module.exports = ext.register("ext/gittools/gittools", {
             ]
         });
 
-        ide.addEventListener("socketMessage", this.onMessage.bind(this));
+        /*ide.addEventListener("socketMessage", this.onMessage.bind(this));*/
 
         tabEditors.addEventListener("afterswitch", function(e){
             var file = _self.getFilePath(e.previous);
@@ -125,7 +125,7 @@ module.exports = ext.register("ext/gittools/gittools", {
                             revisions : {}
                         };
                     }
-                    ide.send(JSON.stringify(data));
+                    /*ide.send(JSON.stringify(data));*/
                 }
             }
         }
@@ -157,7 +157,7 @@ module.exports = ext.register("ext/gittools/gittools", {
                     );
                 }
                 else {
-                    ide.send(JSON.stringify(data));
+                    /*ide.send(JSON.stringify(data));*/
                     if (!this.originalGutterWidth)
                         this.originalGutterWidth = editors.currentEditor.ceEditor.$editor.renderer.getGutterWidth();
 
@@ -188,7 +188,7 @@ module.exports = ext.register("ext/gittools/gittools", {
                         "This operation could not be completed because you are offline."
                     );
                 } else {
-                    ide.send(JSON.stringify(data));
+                    /*ide.send(JSON.stringify(data));*/
                 }
             }
         }

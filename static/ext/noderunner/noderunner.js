@@ -31,21 +31,21 @@ module.exports = ext.register("ext/noderunner/noderunner", {
     },
 
     init : function(amlNode){
-        ide.addEventListener("socketDisconnect", this.onDisconnect.bind(this));
-        ide.addEventListener("socketMessage", this.onMessage.bind(this));
+        /*ide.addEventListener("socketDisconnect", this.onDisconnect.bind(this));
+        ide.addEventListener("socketMessage", this.onMessage.bind(this));*/
 
         dbg.addEventListener("break", function(e){
             ide.dispatchEvent("break", e);
         });
 
-        dbgNode.addEventListener("onsocketfind", function() {
+        /*dbgNode.addEventListener("onsocketfind", function() {
             return ide.socket;
-        });
+        });*/
 
         stDebugProcessRunning.addEventListener("activate", this.$onDebugProcessActivate.bind(this));
         stDebugProcessRunning.addEventListener("deactivate", this.$onDebugProcessDeactivate.bind(this));
 
-        ide.addEventListener("consolecommand.run", function(e) {
+        /*ide.addEventListener("consolecommand.run", function(e) {
             ide.send(JSON.stringify({
                 command: "internal-isfile",
                 argv: e.data.argv,
@@ -53,7 +53,7 @@ module.exports = ext.register("ext/noderunner/noderunner", {
                 sender: "noderunner"
             }));
             return false;
-        });
+        });*/
     },
 
     $onDebugProcessActivate : function() {
@@ -131,7 +131,7 @@ module.exports = ext.register("ext/noderunner/noderunner", {
                     });
                 }
                 
-                ide.send('{"command": "state"}');
+                /*ide.send('{"command": "state"}');*/
                 break;
         }
     },
@@ -161,17 +161,17 @@ module.exports = ext.register("ext/noderunner/noderunner", {
                 "C9_SELECTED_FILE": page ? page.getAttribute("path").slice(ide.davPrefix.length) : ""
             }
         };
-        ide.send(JSON.stringify(command));
+        /*ide.send(JSON.stringify(command));*/
     },
 
     stop : function() {
         if (!stProcessRunning.active)
             return;
 
-        ide.send(JSON.stringify({
+        /*ide.send(JSON.stringify({
             "command": "kill",
             "runner"  : "node" //ddRunnerSelector.value // Explicit addition; trying to affect as less logic as possible for now...
-        }));
+        }));*/
     },
 
     enable : function(){
