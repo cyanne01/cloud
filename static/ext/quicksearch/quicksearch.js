@@ -4,7 +4,7 @@
  * @copyright 2010, Ajax.org B.V.
  * @license GPLv3 <http://www.gnu.org/licenses/gpl.txt>
  */
-
+ 
 define(function(require, exports, module) {
 
 var ide = require("core/ide");
@@ -15,18 +15,12 @@ var Search = require("ace/search").Search;
 var skin = require("text!ext/quicksearch/skin.xml");
 var markup = require("text!ext/quicksearch/quicksearch.xml");
 
-var oIter, oTotal;
-
 module.exports = ext.register("ext/quicksearch/quicksearch", {
     name    : "quicksearch",
     dev     : "Ajax.org",
     type    : ext.GENERAL,
     alone   : true,
-    skin     : {
-        id   : "quicksearch",
-        data : skin,
-        "icon-path" : ide.staticPrefix + "/ext/quicksearch/icons/"
-    },
+    skin    : skin,
     markup  : markup,
     commands : {
         "quicksearch": {hint: "quickly search for a string inside the active document, without further options (see 'search')"},
@@ -44,8 +38,6 @@ module.exports = ext.register("ext/quicksearch/quicksearch", {
 
     nodes   : [],
 
-    currentRange: null,
-
     hook : function(){
         var _self = this;
         code.commandManager.addCommand({
@@ -58,16 +50,19 @@ module.exports = ext.register("ext/quicksearch/quicksearch", {
 
     init : function(amlNode){
         var _self = this;
-
+        
         txtQuickSearch.addEventListener("keydown", function(e){
             switch (e.keyCode){
                 case 13: //ENTER
-                    _self.execSearch(false, !!e.shiftKey);
+                    if (e.shiftKey)
+                        _self.execSearch(false, true);
+                    else
+                        _self.execSearch(false, false);
                     return false;
                 case 27: //ESCAPE
                     _self.toggleDialog(-1);
                     if (e.htmlEvent)
-                        apf.stopEvent(e.htmlEvent);
+                        apf.stopEvent(e.htmlEvent)
                     else if (e.stop)
                         e.stop();
                     return false;
@@ -87,7 +82,7 @@ module.exports = ext.register("ext/quicksearch/quicksearch", {
                 break;
             }
         });
-
+        
         winQuickSearch.addEventListener("blur", function(e){
             if (!apf.isChildOf(winQuickSearch, e.toElement))
                 _self.toggleDialog(-1);
@@ -96,20 +91,19 @@ module.exports = ext.register("ext/quicksearch/quicksearch", {
             if (!apf.isChildOf(winQuickSearch, e.toElement))
                 _self.toggleDialog(-1);
         });
-
+        
         var editor = editors.currentEditor;
         if (editor && editor.ceEditor)
             editor.ceEditor.parentNode.appendChild(winQuickSearch);
     },
-
+    
     navigateList : function(type){
         var settings = require("ext/settings/settings");
-        if (!settings)
-            return;
-
+        if (!settings) return;
+        
         var model = settings.model;
         var lines = model.queryNodes("search/word");
-
+        
         var next;
         if (type == "prev")
             next = Math.max(0, this.position - 1);
@@ -126,63 +120,10 @@ module.exports = ext.register("ext/quicksearch/quicksearch", {
             this.position = next;
         }
     },
-
+    
     handleQuicksearchEscape : function(e) {
         if (e.keyCode == 27)
             this.toggleDialog(-1);
-    },
-
-    updateCounter: function() {
-        var ace = this.$getAce();
-        var width, buttonWidth;
-
-        if (!oIter) {
-            oIter  = document.getElementById("spanSearchIter");
-            oTotal = document.getElementById("spanSearchTotal");
-        }
-
-        if (oIter.parentNode) {
-            if (!ace || !winQuickSearch.visible) {
-                oIter.parentNode.style.width = "0px";
-                return;
-            }
-            else
-                oIter.parentNode.style.width = "auto";
-        }
-
-        setTimeout(function() {
-            if (oIter.parentNode && txtQuickSearch && txtQuickSearch.$button) {
-                width = oIter.parentNode.offsetWidth || 0;
-                txtQuickSearch.$button.style.right = width + "px";
-                buttonWidth = txtQuickSearch.$button.offsetWidth || 0;
-                txtQuickSearch.$input.parentNode.style.paddingRight = (width + buttonWidth + 10) + "px";
-            }
-        });
-
-        var ranges = ace.$search.findAll(ace.getSession());
-        if (!ranges || !ranges.length) {
-            oIter.innerHTML = "0";
-            oTotal.innerHTML = "of 0";
-            return;
-        }
-        var crtIdx = -1;
-        var cur = this.currentRange;
-        if (cur) {
-            // sort ranges by position in the current document
-            ranges.sort(cur.compareRange.bind(cur));
-            var range;
-            var start = cur.start;
-            var end = cur.end;
-            for (var i = 0, l = ranges.length; i < l; ++i) {
-                range = ranges[i];
-                if (range.isStart(start.row, start.column) && range.isEnd(end.row, end.column)) {
-                    crtIdx = i;
-                    break;
-                }
-            }
-        }
-        oIter.innerHTML = String(++crtIdx);
-        oTotal.innerHTML = "of " + ranges.length;
     },
 
     toggleDialog: function(force) {
@@ -198,19 +139,17 @@ module.exports = ext.register("ext/quicksearch/quicksearch", {
         if (!editor || !editor.ceEditor)
             return;
 
-        var _self = this;
-
         if (!force && !winQuickSearch.visible || force > 0) {
-            this.position = -1;
-
+            this.position = 0;
+            
             var sel   = editor.getSelection();
             var doc   = editor.getDocument();
             var range = sel.getRange();
             var value = doc.getTextRange(range);
-
+            
             if (!value && editor.ceEditor)
-               value = editor.ceEditor.getLastSearchOptions().needle;
-
+                value = editor.ceEditor.getLastSearchOptions().needle;
+            
             if (value)
                 txtQuickSearch.setValue(value);
 
@@ -218,7 +157,7 @@ module.exports = ext.register("ext/quicksearch/quicksearch", {
             winQuickSearch.show();
             txtQuickSearch.focus();
             txtQuickSearch.select();
-
+            
             //Animate
             apf.tween.single(winQuickSearch, {
                 type     : "top",
@@ -227,16 +166,13 @@ module.exports = ext.register("ext/quicksearch/quicksearch", {
                 to       : 2,
                 steps    : 8,
                 interval : 10,
-                control  : (this.control = {}),
-                onfinish : function() {
-                    _self.updateCounter();
-                }
+                control  : (this.control = {})
             });
         }
         else if (winQuickSearch.visible) {
             txtQuickSearch.focus();
             txtQuickSearch.select();
-
+            
             //Animate
             apf.tween.single(winQuickSearch, {
                 type     : "top",
@@ -261,82 +197,79 @@ module.exports = ext.register("ext/quicksearch/quicksearch", {
     },
 
     execSearch: function(close, backwards) {
-        var ace = this.$getAce();
-        if (!ace)
+        var editor = editors.currentEditor;
+        if (!editor || !editor.ceEditor)
             return;
+        
+        var ceEditor = editor.ceEditor;
+        var ace      = ceEditor.$editor;
 
         var txt = txtQuickSearch.getValue();
         if (!txt)
             return;
 
         var options = {
-            backwards: !!backwards,
-            wrap: true,
-            caseSensitive: false,
-            wholeWord: false,
-            regExp: false,
-            scope: Search.ALL
+            backwards: backwards || false, 
+            wrap: true, 
+            caseSensitive: false, 
+            wholeWord: false, 
+            regExp: false, 
+            scope: Search.ALL 
         };
 
-        if (this.$crtSearch != txt)
+        if (this.$crtSearch != txt) {
             this.$crtSearch = txt;
-        ace.find(txt, options);
-        this.currentRange = ace.selection.getRange();
-
+            ace.find(txt, options);
+        }
+        else {
+            ace.find(txt, options);
+        }
+        
         var settings = require("ext/settings/settings");
         if (settings.model) {
             var history = settings.model;
             var search = apf.createNodeFromXpath(history.data, "search");
-
+            
             if (!search.firstChild || search.firstChild.getAttribute("key") != txt) {
                 var keyEl = apf.getXml("<word />");
                 keyEl.setAttribute("key", txt);
                 apf.xmldb.appendChild(search, keyEl, search.firstChild);
             }
         }
-
+        
         if (close) {
             winQuickSearch.hide();
-            editors.currentEditor.ceEditor.focus();
+            ceEditor.focus();
         }
-
-        this.updateCounter();
     },
-
+    
     find: function() {
         this.toggleDialog(1);
         return false;
     },
-
+    
     findnext: function() {
-        var ace = this.$getAce();
-        if (!ace)
-            return;
-
-        ace.findNext();
-        this.currentRange = ace.selection.getRange();
-        this.updateCounter();
-        return false;
-    },
-
-    findprevious: function() {
-        var ace = this.$getAce();
-        if (!ace)
-            return;
-
-        ace.findPrevious();
-        this.currentRange = ace.selection.getRange();
-        this.updateCounter();
-        return false;
-    },
-
-    $getAce: function() {
         var editor = editors.currentEditor;
         if (!editor || !editor.ceEditor)
             return;
-
+        
         var ceEditor = editor.ceEditor;
-        return ceEditor.$editor;
+        var ace      = ceEditor.$editor;
+
+        ace.findNext();
+        return false;
+    },
+    
+    findprevious: function() {
+        var editor = editors.currentEditor;
+        if (!editor || !editor.ceEditor)
+            return;
+        
+        var ceEditor = editor.ceEditor;
+        var ace      = ceEditor.$editor;
+
+        ace.findPrevious();
+        return false;
     },
 
     enable : function(){

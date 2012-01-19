@@ -10,6 +10,8 @@ define(function(require, exports, module) {
 var ide = require("core/ide");
 var ext = require("core/ext");
 var util = require("core/util");
+var panels = require("ext/panels/panels");
+var dockpanel = require("ext/dockpanel/dockpanel");
 var settings = require("ext/settings/settings");
 
 module.exports = ext.register("ext/editors/editors", {
@@ -18,13 +20,15 @@ module.exports = ext.register("ext/editors/editors", {
     alone   : true,
     type    : ext.GENERAL,
     nodes   : [],
+    visible : true,
+    alwayson : true,
 
-    fileExtensions  : {},
+    contentTypes  : {},
 
     register : function(oExtension){
-        /*var id = "rb" + oExtension.path.replace(/\//g, "_");
+        var id = "rb" + oExtension.path.replace(/\//g, "_");
 
-        oExtension.$rbEditor = barButtons.appendChild(new apf.radiobutton({
+        /*oExtension.$rbEditor = barButtons.appendChild(new apf.radiobutton({
             id        : id,
             label     : oExtension.name,
             value     : oExtension.path,
@@ -36,42 +40,40 @@ module.exports = ext.register("ext/editors/editors", {
         }));*/
 
         //Add a menu item to the list of editors
-        oExtension.$itmEditor = mnuEditors.appendChild(new apf.item({
-            type     : "radio",
-            caption  : oExtension.name,
-            value    : oExtension.path,
-            disabled : "{!require('ext/editors/editors').isEditorAvailable(tabEditors.activepage, '" 
-                + oExtension.path + "')}",
-            onclick  : function(){
+        /*oExtension.$itmEditor = ide.mnuEditors.appendChild(new apf.item({
+            type    : "radio",
+            caption : oExtension.name,
+            value   : oExtension.path,
+            onclick : function(){
                 require('ext/editors/editors').switchEditor(this.value);
             }
-        }));
+        }));*/
 
         var _self = this;
-        oExtension.fileExtensions.each(function(mime){
-            (_self.fileExtensions[mime] || (_self.fileExtensions[mime] = [])).push(oExtension);
+        oExtension.contentTypes.each(function(mime){
+            (_self.contentTypes[mime] || (_self.contentTypes[mime] = [])).push(oExtension);
         });
 
-        if (!this.fileExtensions["default"] || (oExtension.name && oExtension.name == "Code Editor"))
-            this.fileExtensions["default"] = oExtension;
+        if (!this.contentTypes["default"] || (oExtension.name && oExtension.name == "Code Editor"))
+            this.contentTypes["default"] = oExtension;
     },
 
     unregister : function(oExtension){
         //oExtension.$rbEditor.destroy(true, true);
-        oExtension.$itmEditor.destroy(true, true);
+        //oExtension.$itmEditor.destroy(true, true);
 
         var _self = this;
-        oExtension.fileExtensions.each(function(fe){
-            _self.fileExtensions[fe].remove(oExtension);
-            if (!_self.fileExtensions[fe].length)
-                delete _self.fileExtensions[fe];
+        oExtension.contentTypes.each(function(fe){
+            _self.contentTypes[fe].remove(oExtension);
+            if (!_self.contentTypes[fe].length)
+                delete _self.contentTypes[fe];
         });
 
-        if (this.fileExtensions["default"] == oExtension) {
-            delete this.fileExtensions["default"];
+        if (this.contentTypes["default"] == oExtension) {
+            delete this.contentTypes["default"];
 
-            for (var prop in this.fileExtensions) {
-                this.fileExtensions["default"] = this.fileExtensions[prop][0];
+            for (var prop in this.contentTypes) {
+                this.contentTypes["default"] = this.contentTypes[prop][0];
                 break;
             }
         }
@@ -87,7 +89,7 @@ module.exports = ext.register("ext/editors/editors", {
         var tab = new apf.bar({
             skin     : "basic",
             style    : "padding : 0 0 33px 0;position:absolute;", //53px
-            //htmlNode : document.body,
+            htmlNode : document.body,
             childNodes: [
                 new apf.tab({
                     id      : "tabEditors",
@@ -112,7 +114,6 @@ module.exports = ext.register("ext/editors/editors", {
                     },
                     childNodes : [
                         btn = new apf.button({
-                            id : "plus_tab_button",
                             style : "display:inline-block;margin: 0 0 5px 13px;",
                             right : 5,
                             top   : 8,
@@ -147,8 +148,6 @@ module.exports = ext.register("ext/editors/editors", {
                 })*/
             ]
         });
-        
-        apf.document.body.appendChild(tab);
 
         tabEditors.$buttons.appendChild(btn.$ext);
         tabEditors.addEventListener("DOMNodeInserted",function(e){
@@ -163,7 +162,6 @@ module.exports = ext.register("ext/editors/editors", {
             }
 
             if (e.relatedNode == this && e.currentTarget.localName == "page") {
-                tabEditors.appendChild(btn);
                 tabEditors.$buttons.appendChild(btn.$ext);
                 btn.$ext.style.position = "";
                 btn.$ext.style.right = "";
@@ -198,8 +196,7 @@ module.exports = ext.register("ext/editors/editors", {
         ext.style.left = (pos[0] - 2) + "px";
         ext.style.top = pos[1] + "px";
         var d = apf.getDiff(ext);
-        // + (hboxDockPanel.getWidth() && apf.isGecko ? 2 : 0)
-        ext.style.width = (ph.offsetWidth + 2 - d[0]) + "px";
+        ext.style.width = (ph.offsetWidth + 2 + (apf.isGecko && dockpanel.visible ? 2 : 0) - d[0]) + "px";
         ext.style.height = (ph.offsetHeight - d[1]) + "px";
     },
 
@@ -222,12 +219,11 @@ module.exports = ext.register("ext/editors/editors", {
         if (!editor)
             return false;
 
-        var fileExtensions = editor.fileExtensions;
-        var fileExtension = (tabEditors.getPage(page).$model.queryValue("@path") || "").split(".").pop();
-        var isEnabled = fileExtensions.indexOf(fileExtension) > -1;
-        
-        if (!isEnabled && this.fileExtensions["default"] == editor)
-            return true; 
+        var contentTypes = editor.contentTypes;
+        var isEnabled = contentTypes.indexOf(tabEditors.getPage(page).contentType) > -1;
+
+        if (!isEnabled && this.contentTypes["default"] == editor)
+            return true;
         else
             return isEnabled;
     },
@@ -236,7 +232,7 @@ module.exports = ext.register("ext/editors/editors", {
         //Create Page Element
         var editorPage = new apf.page({
             id        : editor.path,
-            mimeTypes : editor.fileExtensions,
+            mimeTypes : editor.contentTypes,
             visible   : false,
             realtime  : false
         });
@@ -254,28 +250,15 @@ module.exports = ext.register("ext/editors/editors", {
             return;
 
         var lastType = page.type;
-        
-        var info;
-        if ((info = page.$doc.dispatchEvent("validate", info)) !== true) {
-            util.alert(
-                "Could not switch editor",
-                "Could not switch editor because this document is invalid.",
-                "Please fix the error and try again:" + info
-            );
-            return;
-        }
 
         var editor = ext.extLut[path];
         if (!editor.inited)
             this.initEditor(editor);
 
-        editor.$itmEditor.select();
+        //editor.$itmEditor.select();
         //editor.$rbEditor.select();
 
         page.setAttribute("type", path);
-        
-        page.$editor = editor;
-        this.currentEditor = editor;
 
         this.beforeswitch({nextPage: page});
         this.afterswitch({nextPage: page, previousPage: {type: lastType}});
@@ -283,6 +266,7 @@ module.exports = ext.register("ext/editors/editors", {
 
     openEditor : function(doc, init, active) {
         var xmlNode  = doc.getNode();
+        var filename = xmlNode.getAttribute("name");
         var filepath = xmlNode.getAttribute("path");
 
         var page = tabEditors.getPage(filepath);
@@ -291,10 +275,8 @@ module.exports = ext.register("ext/editors/editors", {
             return;
         }
 
-        var fileExtension = (xmlNode.getAttribute("path") || "").split(".").pop();
-        var editor = this.fileExtensions[fileExtension] 
-          && this.fileExtensions[fileExtension][0] 
-          || this.fileExtensions["default"];
+        var contentType = (xmlNode.getAttribute("contenttype") || "").split(";")[0];
+        var editor = this.contentTypes[contentType] && this.contentTypes[contentType][0] || this.contentTypes["default"];
 
         if (!init && this.currentEditor)
             this.currentEditor.disable();
@@ -315,7 +297,8 @@ module.exports = ext.register("ext/editors/editors", {
             tabEditors.setAttribute("buttons", "close");
 
         var model = new apf.model();
-        var fake = tabEditors.add("{([@changed] == 1 ? '*' : '') + [@name]}", filepath, editor.path, null, function(page){
+        var fake = tabEditors.add("{([@changed] == 1 ? '*' : '') + [@name]}", filepath, editor.path, null, function(page) {
+            page.contentType = contentType;
             page.$at     = new apf.actiontracker();
             page.$doc    = doc;
             doc.$page    = page;
@@ -331,6 +314,8 @@ module.exports = ext.register("ext/editors/editors", {
 
         if (init)
             tabEditors.setAttribute("buttons", "close,scale,order");
+
+        var editorPage = tabEditors.getPage(tabEditors.activepage);
 
         doc.addEventListener("setnode", function(e) {
             fake.$model.load(e.node);
@@ -354,7 +339,7 @@ module.exports = ext.register("ext/editors/editors", {
         });*/
 
         editor.enable();
-        editor.$itmEditor.select();
+        //editor.$itmEditor.select();
         //editor.$rbEditor.select();
 
         this.currentEditor = editor;
@@ -362,7 +347,7 @@ module.exports = ext.register("ext/editors/editors", {
         // okay don't know if you would want this, but this is the way the 'open file' dialog
         // handles it so let's do that
         setTimeout(function () {
-            if (typeof ceEditor !== "undefined")
+            if (ceEditor)
                 ceEditor.focus();
         }, 100);
 
@@ -393,12 +378,6 @@ module.exports = ext.register("ext/editors/editors", {
             if (fake.changed !== val) {
                 fake.changed = val;
                 model.setQueryValue("@changed", (val ? "1" : "0"));
-                
-                var node = fake.$doc.getNode();
-                ide.dispatchEvent("updatefile", {
-                    changed : val ? 1 : 0,
-                    xmlNode : node
-                });
             }
         });
     },
@@ -489,8 +468,8 @@ module.exports = ext.register("ext/editors/editors", {
             apf.history.setHash("!" + path);
         }*/
         apf.history.setHash("!" + path);
-        
-        toHandler.$itmEditor.select();
+
+        //toHandler.$itmEditor.select();
         //toHandler.$rbEditor.select();
 
         /*if (self.TESTING) {}
@@ -503,9 +482,9 @@ module.exports = ext.register("ext/editors/editors", {
 
     /**** Init ****/
 
-    init : function(){
-        var _self = this;
-        
+    hook : function(){
+        panels.register(this);
+
         window.onpopstate = function(e){
             var page = "/workspace" + e.state;
             if (tabEditors.activepage != page && tabEditors.getPage(page))
@@ -517,16 +496,10 @@ module.exports = ext.register("ext/editors/editors", {
             if (tabEditors.activepage != page && tabEditors.getPage(page))
                 tabEditors.set(page);
         });
-        
-        apf.document.body.appendChild(new apf.menu({
-            id : "mnuEditors"
-        }));
-        
-        mnuView.insertBefore(new apf.item({
-            caption : "Editor",
-            submenu : "mnuEditors"
-        }), mnuView.firstChild);
-        
+    },
+
+    init : function(){
+        var _self = this;
         ext.addType("Editor", function(oExtension){
             _self.register(oExtension);
           }, function(oExtension){
@@ -554,34 +527,22 @@ module.exports = ext.register("ext/editors/editors", {
 
         this.$settings = {};
         ide.addEventListener("loadsettings", function(e){
-            if (!e.model.queryNode("auto/files"));
-                apf.createNodeFromXpath(e.model.data, "auto/files");
-            
             function checkExpand(path, doc) {
-                ide.addEventListener("init.ext/tree/tree", function(){
-                    var parent_path = apf.getDirname(path).replace(/\/$/, "");
-                    var expandEventListener = function(e) {
-                        if (e.xmlNode && e.xmlNode.getAttribute("path") == parent_path) {
-                            // if the file has been loaded from the tree
-                            if (doc.getNode().getAttribute("newfile") != 1) {
-                                // databind the node from the tree to the document
-                                doc.setNode(e.xmlNode.selectSingleNode("node()[@path='" + path + "']"));
-                            }
-                            else {
-                                // if not? then keep it this way, but invoke setNode() anyway because
-                                // it triggers events
-                                doc.setNode(doc.getNode());
-                            }
-                            trFiles.removeEventListener("expand", expandEventListener);
-                        }
-                    };
-    
-                    trFiles.addEventListener("expand", expandEventListener);
-                });
+                var parent_path = apf.getDirname(path).replace(/\/$/, "");
+                var expandEventListener = function(e) {
+                    if (e.xmlNode && e.xmlNode.getAttribute("path") == parent_path) {
+                        if (doc.getNode().getAttribute("newfile") != 1)
+                            doc.setNode(e.xmlNode.selectSingleNode("node()[@path='" + path + "']"));
+                        trFiles.removeEventListener("expand", expandEventListener);
+                    }
+                };
+
+                trFiles.addEventListener("expand", expandEventListener);
             }
 
             var model = e.model;
             ide.addEventListener("extload", function(){
+
                 // you can load a file from the hash tag, if that succeeded then return
                 var loadFileFromHash =  (_self.loadFileFromHash(window.location.hash, checkExpand));
                 if (loadFileFromHash) {
@@ -593,10 +554,11 @@ module.exports = ext.register("ext/editors/editors", {
                 var active = model.queryValue("auto/files/@active");
                 var nodes  = model.queryNodes("auto/files/file");
 
+                var doc;
                 for (var i = 0, l = nodes.length; i < l; i++) {
-                    var node  = nodes[i];
+                    var node = nodes[i];
                     var state = node.getAttribute("state");
-                    var doc   = ide.createDocument(node);
+                    doc = ide.createDocument(node);
 
                     try {
                         if (state)
@@ -605,7 +567,7 @@ module.exports = ext.register("ext/editors/editors", {
                     catch (ex) {}
 
                     // node.firstChild is not always present (why?)
-                    if ((node.getAttribute("changed") == 1) && node.firstChild) {
+                    if ((node.getAttribute("changed") === 1) && node.firstChild) {
                         doc.cachedValue = node.firstChild.nodeValue
                             .replace(/\n]\n]/g, "]]")
                             .replace(/\\r/g, "\r")
@@ -626,12 +588,10 @@ module.exports = ext.register("ext/editors/editors", {
         });
 
         ide.addEventListener("savesettings", function(e){
-            if (!e.model.data)
-                return;
-
-            var pNode   = e.model.data.selectSingleNode("auto/files");
-            var state   = pNode && pNode.xml;
-            var pages   = tabEditors.getPages();
+            var changed = false,
+                pNode   = e.model.data.selectSingleNode("auto/files"),
+                state   = pNode && pNode.xml,
+                pages   = tabEditors.getPages();
 
             if (pNode) {
                 pNode.parentNode.removeChild(pNode);
@@ -793,7 +753,7 @@ module.exports = ext.register("ext/editors/editors", {
                 });
         }
 
-        if (!hasData)
+        if (!hasData && !page)
             ide.dispatchEvent("openfile", {
                 doc: doc || ide.createDocument(fileEl)
             });
@@ -814,6 +774,7 @@ module.exports = ext.register("ext/editors/editors", {
     destroy : function(){
         this.hbox.destroy(true, true);
         //this.splitter.destroy(true, true);
+        panels.unregister(this);
     }
 });
 

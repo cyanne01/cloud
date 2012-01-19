@@ -9,6 +9,7 @@ define(function(require, exports, module) {
 
 var ide = require("core/ide");
 var ext = require("core/ext");
+var util = require("core/util");
 
 module.exports = ext.register("ext/recentfiles/recentfiles", {
     dev         : "Ajax.org",
@@ -27,7 +28,7 @@ module.exports = ext.register("ext/recentfiles/recentfiles", {
         this.nodes.push(
             ide.mnuFile.insertBefore(new apf.item({
                 caption : "Open Recent",
-                submenu : "mnuRecent"
+                submenu : "mnuRecent",
             }), ide.mnuFile.firstChild),
 
             apf.document.body.appendChild(this.menu = new apf.menu({
@@ -48,13 +49,12 @@ module.exports = ext.register("ext/recentfiles/recentfiles", {
             var model = e.model;
             var strSettings = model.queryValue("auto/recentfiles");
             if (strSettings) {
-                var currentSettings;
                 try {
-                    currentSettings = JSON.parse(strSettings);
+                    var currentSettings = JSON.parse(strSettings);
                 }
                 catch (ex) {
                     //fail! revert to default
-                    currentSettings = [];
+                    var currentSettings = [];
                 }
 
                 _self.clearMenu();

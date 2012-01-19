@@ -24,6 +24,7 @@ module.exports = ext.register("ext/dockpanel/dockpanel", {
 
     nodes          : [],
     dockpanels     : [],
+    sections       : [],
     
     loaded : false,
     
@@ -32,7 +33,7 @@ module.exports = ext.register("ext/dockpanel/dockpanel", {
      */
     init : function(amlNode){
         var _self = this;
-
+        
         var vManager = new apf.visibilitymanager();
         this.layout = new DockableLayout(hboxDockPanel, 
             //Find Page
@@ -45,15 +46,13 @@ module.exports = ext.register("ext/dockpanel/dockpanel", {
                     return item.page;
 
                 var page = item.getPage();
-                
-                if (page)
-                    page.$arrExtension = arrExtension;
-                
-                vManager.permanent(page, function(e){
+                page.$arrExtension = arrExtension;
+
+                /*vManager.permanent(page, function(e){
                     item.mnuItem.check();
                 }, function(){
                     item.mnuItem.uncheck();
-                });
+                });*/
 
                 return page;
             }, 
@@ -61,13 +60,19 @@ module.exports = ext.register("ext/dockpanel/dockpanel", {
             function(amlPage){
                 var arrExtension = amlPage.$arrExtension;
                 var item = _self.dockpanels[arrExtension[0]][arrExtension[1]];
-                
                 item.page = amlPage;
+
+                _self.sections[arrExtension[0]][arrExtension[1]] = {
+                    buttons : [
+                        { ext : [arrExtension[0], arrExtension[1]] }
+                    ]
+                };
+
                 item.mnuItem.uncheck();
 
-                _self.saveSettings();
+                _self.changed = true;
+                settings.save();
             },
-            //@todo This can be deprecated
             //Find Button Options
             function(arrExtension){
                 if (!arrExtension || !_self.dockpanels[arrExtension[0]])
@@ -77,71 +82,41 @@ module.exports = ext.register("ext/dockpanel/dockpanel", {
             },
             //Change State Handler
             function(){
-                _self.saveSettings();
-            },
-            //Animate Settings
-            function(){
-                return apf.isTrue(settings.model.queryValue('general/@animateui'));
+                _self.changed = true;
+                settings.save();
             }
         );
 
-        //@todo was loadsettings
-        ide.addEventListener("extload", function(e){
-            var model = settings.model;
-            var strSettings = model.queryValue("auto/dockpanel/text()");
-
-            var state = _self.defaultState;
+        ide.addEventListener("loadsettings", function(e){
+            var model = e.model;
+            var strSettings = model.queryValue("auto/dockpanel");
+            
+            var settings = _self.defaultState;
             if (strSettings) {
                 // JSON parse COULD fail
                 try {
-                    state = JSON.parse(strSettings);
+                    var objSettings = JSON.parse(strSettings);
+                    settings = objSettings.state;
+                    apf.extend(_self.sections, objSettings.hidden);
                 }
                 catch (ex) {}
             }
             
-            ide.dispatchEvent("dockpanel.load.settings", {state: state});
-            
-            _self.layout.loadState(state);
+            _self.layout.loadState(_self.defaultState);
             _self.loaded = true;
         });
 
-        mnuToolbar.appendChild(new apf.item({
-            caption : "Restore Default",
-            onclick : function(){
-                var defaultSettings = _self.defaultState,//settings.model.queryValue("auto/dockpanel_default/text()"),
-                    state;
-                    
-                if (defaultSettings) {
-                    // JSON parse COULD fail
-                    try {
-                        state = defaultSettings;//objSettings.state;
-                    }
-                    catch (ex) {}
-                    _self.layout.loadState(state);
-                    
-                    settings.model.setQueryValue("auto/dockpanel/text()", state)
-                    
-                    _self.saveSettings();
-                    
-                    ide.dispatchEvent("restorelayout");
-                }
-            }
-        }));
-        
-        mnuToolbar.appendChild(new apf.divider());
-    },
-    
-    saveSettings : function(){
-        clearTimeout(this.$timer);
-        
-        var _self = this;;
-        this.$timer = setTimeout(function(){
-            var state = _self.layout.getState();
+        ide.addEventListener("savesettings", function(e){
+            if (!_self.changed)
+                return;
+
+            var xmlSettings = apf.createNodeFromXpath(e.model.data, "auto/dockpanel/text()");
+            xmlSettings.nodeValue = apf.serialize({
+                state  : _self.layout.getState(),
+                hidden : _self.sections
+            });
             
-            settings.model.setQueryValue(
-                "auto/dockpanel/text()",
-                JSON.stringify(state)
-            );
+            return true;
         });
     },
 
@@ -168,47 +143,51 @@ module.exports = ext.register("ext/dockpanel/dockpanel", {
 
         var layout = this.layout, _self = this;
 
-        panel[type].mnuItem = mnuToolbar.appendChild(new apf.item({
+        panel[type].mnuItem = mnuWindows.appendChild(new apf.item({
             caption : options.menu.split("/").pop(),
-            id      : "mnu" + type,
             type    : "check",
             onclick : function(){
                 var page = getPage();
 
-                var uId = _self.getButtons(name, type)[0].uniqueId;
-                layout.show(uId, true);
-                if (layout.isExpanded(uId) < 0)
-                    layout.showMenu(uId);
-                
-                page.parentNode.set(page);
+                //Problem state might not be removed from 
+                if (!page.parentNode || !page.parentNode.dock) {
+                    layout.addItem(_self.sections[name][type]);
+                    layout.show(page);
+                }
+                else {
+                    layout.show(page);
+                }
             }
-        }));        
+        }));
+        
+        
     },
 
-    addDockable : function(def){        
-        var state = this.defaultState;
-            
-        if (!def.barNum)
-            def.barNum = 0;
+    addDockable : function(def){
+        if (this.loaded) {
+            this.layout.addItem(def);
+            return;
+        }
         
+        var state = this.defaultState;
         if (def.sections) {
-            if (def.barNum || def.barNum === 0) {
-                if (state.bars[def.barNum])
-                    state.bars[def.barNum].sections.merge(def.sections);
-                else
-                    state.bars[def.barNum] = def;
+            state.bars.push(def);
+            return;
+        }
+        
+        if (def.hidden) {
+            var buttons = def.buttons;
+            for (var i = 0; i < buttons.length; i++) {
+                var ext = buttons[i].ext;
+                (this.sections[ext[0]] || (this.sections[ext[0]] = {}))[ext[1]] = def;
             }
-            else
-                state.bars.push(def);
-            
             return;
         }
 
-        if (!state.bars[def.barNum || 0])
-            state.bars[def.barNum || 0] = {expanded: false, width: 230, sections: []};
+        if (!state.bars[0])
+            state.bars[0] = {expanded: false, width: 200, sections: []};
 
-        var bar = state.bars[def.barNum || 0];
-        
+        var bar = state.bars[0];
         if (def.buttons) {
             bar.sections.push(def);
         }
@@ -224,111 +203,6 @@ module.exports = ext.register("ext/dockpanel/dockpanel", {
         return bar.sections.slice(-1);
     }, //properties.forceShow ??
     
-    getButtons : function(name, type, state){
-        var state = state || this.layout.getState(true);
-        var list  = [];
-        
-        if(!state)
-            return;
-        
-        state.bars.each(function(bar){
-            bar.sections.each(function(section){
-                section.buttons.each(function(button){
-                    if ((!name || button.ext[0] == name)
-                      && (!type || button.ext[1] == type))
-                        list.push(button);
-                });
-            });
-        });
-        
-        return list;
-    },
-    
-    getBars : function(name, type, state){
-        var state = state || this.layout.getState(true);
-        var list  = [];
-        
-        if (!state.bars)
-            return list;
-        
-        state.bars.each(function(bar){
-            var found = false;
-            bar.sections.each(function(section){
-                section.buttons.each(function(button){
-                    if ((!name || button.ext[0] == name)
-                      && (!type || button.ext[1] == type))
-                        found = true;
-                });
-            });
-            
-            if (found)
-                list.push(bar);
-        });
-        
-        return list;
-    },
-    
-    hideSection: function(name, collapse){
-        var buttons = this.getButtons(name);
-        var bars = [];
-        var _self = this;
-        
-        buttons.each(function(button){
-            if (button.hidden < 0)
-                bars.pushUnique(_self.layout.findBar(button.uniqueId));
-            if (button.hidden == -1)
-                _self.layout.hide(button.uniqueId);
-        });
-        
-        if (collapse) {
-            bars.each(function(bar){
-                if (bar.expanded == 1)
-                    _self.layout.collapseBar(bar.uniqueId);
-            });
-        }
-    },
-    
-    showSection: function(name, expand){
-        var buttons = this.getButtons(name);
-        var _self = this;
-        var bars = [];
-        
-        buttons.each(function(button){
-            if (button.hidden && button.hidden == 1) {
-                _self.layout.show(button.uniqueId);
-                bars.pushUnique(_self.layout.findBar(button.uniqueId));
-            }
-        });
-        
-        bars.each(function(bar){
-            if (expand && bar.expanded < 0)
-                _self.layout.expandBar(bar.uniqueId);
-        });
-    },
-    
-    showBar : function(bar){
-        if (bar.cache) {
-            bar.cache.show();
-            return;
-        }
-        
-        var _self = this;
-        bar.sections.each(function(section){
-            section.buttons.each(function(button){
-                _self.layout.show(button.uniqueId);
-            });
-        });
-    },
-    
-    hideBar : function(bar){
-        if (bar.cache)
-            bar.cache.hide();
-    },
-    
-    expandBar : function(bar){
-        this.layout.expandBar(bar.cache);
-    },
-    
     //@todo removal of pages
     
     /**
@@ -338,10 +212,10 @@ module.exports = ext.register("ext/dockpanel/dockpanel", {
      */
     increaseNotificationCount: function(windowIdent){
         /*for(var doi = 0; doi < this.dockObjects.length; doi++) {
-            if (this.dockObjects[doi].ident == windowIdent) {
+            if(this.dockObjects[doi].ident == windowIdent) {
                 // Only increase notification count if window is hidden
-                if (this.dockObjects[doi].btn.value == false) {
-                    if (this.dockObjects[doi].notCount >= 99)
+                if(this.dockObjects[doi].btn.value == false) {
+                    if(this.dockObjects[doi].notCount >= 99)
                         return true;
 
                     this.dockObjects[doi].notCount++;
@@ -362,10 +236,10 @@ module.exports = ext.register("ext/dockpanel/dockpanel", {
      * Resets the notification count to 0
      */
     resetNotificationCount: function(windowIdent){
-        if (windowIdent == -1) return;
+        if(windowIdent == -1) return;
 
         for(var doi = 0; doi < this.dockObjects.length; doi++) {
-            if (this.dockObjects[doi].ident == windowIdent) {
+            if(this.dockObjects[doi].ident == windowIdent) {
                 this.dockObjects[doi].notCount = 0;
                 this.updateNotificationElement(this.dockObjects[doi].btn, 0);
                 return true;
@@ -379,7 +253,7 @@ module.exports = ext.register("ext/dockpanel/dockpanel", {
      * Updates the notification element to visually reflect notCount
      */
     updateNotificationElement: function(btnObj, count){
-        if (count == 0) {
+        if(count == 0) {
             var countInner = "";
         }
         
@@ -387,7 +261,7 @@ module.exports = ext.register("ext/dockpanel/dockpanel", {
             var countInner = count;
         }
 
-        if (apf.isGecko) {
+        if(apf.isGecko) {
             btnObj.$ext.getElementsByClassName("dock_notification")[0].textContent = countInner;
         }
             

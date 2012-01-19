@@ -210,30 +210,28 @@ module.exports = ext.register("ext/watcher/watcher", {
             checkPage();
         });
         
-        ide.addEventListener("init.ext/tree/tree", function(){
-            trFiles.addEventListener("expand", function(e) {
-                if (_self.disabled) return;
-                
-                var node = e.xmlNode;
-                if (node && (node.getAttribute("type") == "folder" || node.tagName == "folder")) {
-                    var path = node.getAttribute("path");
-                    
-                    expandedPaths[path] = path;
-                    sendWatchFile(path);
-                }
-            });
+        trFiles.addEventListener("expand", function(e) {
+            if (_self.disabled) return;
             
-            trFiles.addEventListener("collapse", function (e) {
-                if (_self.disabled) return;
-    
-                var node = e.xmlNode;
-                if (node && (node.getAttribute("type") == "folder" || node.tagName == "folder")) {
-                    var path = node.getAttribute("path");
-                    
-                    delete expandedPaths[path];
-                    sendUnwatchFile(path);
-                }
-            });
+            var node = e.xmlNode;
+            if (node && (node.getAttribute("type") == "folder" || node.tagName == "folder")) {
+                var path = node.getAttribute("path");
+                
+                expandedPaths[path] = path;
+                sendWatchFile(path);
+            }
+        });
+        
+        trFiles.addEventListener("collapse", function (e) {
+            if (_self.disabled) return;
+
+            var node = e.xmlNode;
+            if (node && (node.getAttribute("type") == "folder" || node.tagName == "folder")) {
+                var path = node.getAttribute("path");
+                
+                delete expandedPaths[path];
+                sendUnwatchFile(path);
+            }
         });
     },
     

@@ -7,11 +7,9 @@
  
 define(function(require, exports, module) {
 
-require("apf/elements/debugger");
-require("apf/elements/debughost");
-
 var ide = require("core/ide");
 var ext = require("core/ext");
+var util = require("core/util");
 var markup = require("text!ext/noderunner/noderunner.xml");
 
 module.exports = ext.register("ext/noderunner/noderunner", {
@@ -31,21 +29,17 @@ module.exports = ext.register("ext/noderunner/noderunner", {
     },
 
     init : function(amlNode){
-        /*ide.addEventListener("socketDisconnect", this.onDisconnect.bind(this));
-        ide.addEventListener("socketMessage", this.onMessage.bind(this));*/
+        ide.addEventListener("socketDisconnect", this.onDisconnect.bind(this));
+        ide.addEventListener("socketMessage", this.onMessage.bind(this));
 
-        dbg.addEventListener("break", function(e){
-            ide.dispatchEvent("break", e);
-        });
-
-        /*dbgNode.addEventListener("onsocketfind", function() {
+        dbgNode.addEventListener("onsocketfind", function() {
             return ide.socket;
-        });*/
+        });
 
         stDebugProcessRunning.addEventListener("activate", this.$onDebugProcessActivate.bind(this));
         stDebugProcessRunning.addEventListener("deactivate", this.$onDebugProcessDeactivate.bind(this));
 
-        /*ide.addEventListener("consolecommand.run", function(e) {
+        ide.addEventListener("consolecommand.run", function(e) {
             ide.send(JSON.stringify({
                 command: "internal-isfile",
                 argv: e.data.argv,
@@ -53,7 +47,7 @@ module.exports = ext.register("ext/noderunner/noderunner", {
                 sender: "noderunner"
             }));
             return false;
-        });*/
+        });
     },
 
     $onDebugProcessActivate : function() {
@@ -61,7 +55,7 @@ module.exports = ext.register("ext/noderunner/noderunner", {
     },
 
     $onDebugProcessDeactivate : function() {
-        dbg.detach(function(){});
+        dbg.detach();
     },
 
     onMessage : function(e) {
@@ -94,7 +88,6 @@ module.exports = ext.register("ext/noderunner/noderunner", {
                 break;
 
             case "state":
-                
                 stDebugProcessRunning.setProperty("active", message.debugClient || message.nodeDebugClient);
                 stProcessRunning.setProperty("active", message.processRunning || message.nodeProcessRunning || message.pythonProcessRunning);
                 dbgNode.setProperty("strip", message.workspaceDir + "/");
@@ -131,7 +124,7 @@ module.exports = ext.register("ext/noderunner/noderunner", {
                     });
                 }
                 
-                /*ide.send('{"command": "state"}');*/
+                ide.send('{"command": "state"}');
                 break;
         }
     },
@@ -140,14 +133,19 @@ module.exports = ext.register("ext/noderunner/noderunner", {
         stDebugProcessRunning.deactivate();
     },
 
+    debugChrome : function() {
+        var command = {
+            "command" : "RunDebugChrome",
+            "file"    : ""
+        };
+        ide.send(JSON.stringify(command));
+    },
+
     debug : function() {
         this.$run(true);
     },
 
-    run : function(path, args, debug) {
-        // this is a manual action, so we'll tell that to the debugger
-        dbg.registerManualAttach();
-        
+    run : function(path, args, debug) {      
         if (stProcessRunning.active || !stServerConnected.active/* || (ddRunnerSelector.value=='gae' ? '' : !path)*/ || typeof path != "string")
             return false;
 
@@ -161,17 +159,22 @@ module.exports = ext.register("ext/noderunner/noderunner", {
                 "C9_SELECTED_FILE": page ? page.getAttribute("path").slice(ide.davPrefix.length) : ""
             }
         };
-        /*ide.send(JSON.stringify(command));*/
+        ide.send(JSON.stringify(command));
+
+        if (debug)
+            stDebugProcessRunning.activate();
+
+        stProcessRunning.activate();
     },
 
     stop : function() {
         if (!stProcessRunning.active)
             return;
 
-        /*ide.send(JSON.stringify({
+        ide.send(JSON.stringify({
             "command": "kill",
             "runner"  : "node" //ddRunnerSelector.value // Explicit addition; trying to affect as less logic as possible for now...
-        }));*/
+        }));
     },
 
     enable : function(){

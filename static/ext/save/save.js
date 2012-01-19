@@ -42,9 +42,8 @@ module.exports = ext.register("ext/save/save", {
             var at = e.page.$at;
             if (!at.undo_ptr)
                 at.undo_ptr = at.$undostack[0];
-            var node = e.page.$doc.getNode();
-            if (node && at.undo_ptr && at.$undostack[at.$undostack.length-1] !== at.undo_ptr
-              || !at.undo_ptr && node.getAttribute("changed") == 1
+            if (at.undo_ptr && at.$undostack[at.$undostack.length-1] !== at.undo_ptr
+              || !at.undo_ptr && e.page.$doc.getNode().getAttribute("changed") == 1
               && e.page.$doc.getValue()) {
                 ext.initExtension(_self);
 
@@ -55,16 +54,10 @@ module.exports = ext.register("ext/save/save", {
                 winCloseConfirm.addEventListener("hide", function(){
                     if (winCloseConfirm.all != -100) {
                         var f = function(resetUndo){
-                            var page;
-                            if (!(page=winCloseConfirm.page))
-                                return;
-
-                            tabEditors.remove(page, true, page.noAnim);
-                            delete page.noAnim;
+                            tabEditors.remove(winCloseConfirm.page, true);
                             if (resetUndo)
-                                page.$at.undo(-1);
+                                winCloseConfirm.page.$at.undo(-1);
                             delete winCloseConfirm.page;
-                            page.dispatchEvent("aftersavedialogclosed");
                         };
 
                         if (winCloseConfirm.all == -200)
@@ -73,9 +66,6 @@ module.exports = ext.register("ext/save/save", {
                             f(true);
                         /*winSaveAs.page = winCloseConfirm.page;*/
                     }
-                    else
-                        tabEditors.dispatchEvent("aftersavedialogcancel");
-
                     winCloseConfirm.removeEventListener("hide", arguments.callee);
                 });
 
@@ -179,6 +169,8 @@ module.exports = ext.register("ext/save/save", {
     saveall : function(){
         var pages = tabEditors.getPages();
         for (var i = 0; i < pages.length; i++) {
+            var at = pages[i].$at;
+            // if (at.undo_ptr && at.$undostack[at.$undostack.length-1] !== at.undo_ptr)
             this.quicksave(pages[i]);
         }
     },
@@ -194,6 +186,8 @@ module.exports = ext.register("ext/save/save", {
             if (at.undo_ptr && at.$undostack[at.$undostack.length-1] !== at.undo_ptr) {
                 if (winCloseConfirm.all == 1)
                     _self.quicksave(item);
+                //else if (winCloseConfirm.all == -1)
+                    //item.$at.undo(-1);
 
                 if (winCloseConfirm.all)
                     return next();
@@ -204,6 +198,8 @@ module.exports = ext.register("ext/save/save", {
                 winCloseConfirm.addEventListener("hide", function(){
                     if (winCloseConfirm.all == 1)
                         _self.quicksave(item);
+                    //else if (winCloseConfirm.all == -1)
+                        //item.$at.undo(-1);
 
                     winCloseConfirm.removeEventListener("hide", arguments.callee);
                     next();
@@ -229,18 +225,16 @@ module.exports = ext.register("ext/save/save", {
 
         var doc  = page.$doc;
         var node = doc.getNode();
-        var path = node.getAttribute("path");
-
-        if (node.getAttribute("debug"))
-            return;
-
-        if (ide.dispatchEvent("beforefilesave", {node: node, doc: doc }) === false)
-            return;
 
         if (node.getAttribute("newfile")){
             this.saveas(page, callback);
             return;
         }
+
+        if (node.getAttribute("debug"))
+            return;
+
+        var path = node.getAttribute("path");
 
         if (callback) {
             ide.addEventListener("afterfilesave", function(e){
@@ -257,11 +251,12 @@ module.exports = ext.register("ext/save/save", {
             this.saveBuffer[path] = page;
             return;
         }
-
         apf.xmldb.setAttribute(node, "saving", "1");
 
         var _self = this, panel = sbMain.firstChild;
         panel.setAttribute("caption", "Saving file " + path);
+
+        ide.dispatchEvent("beforefilesave", {node: node, doc: doc });
 
         var value = doc.getValue();
 
@@ -278,11 +273,6 @@ module.exports = ext.register("ext/save/save", {
 
             panel.setAttribute("caption", "Saved file " + path);
             ide.dispatchEvent("afterfilesave", {node: node, doc: doc, value: value});
-            ide.dispatchEvent("track_action", {
-                type: "save as filetype",
-                fileType: node.getAttribute("name").split(".").pop(),
-                success: state != apf.SUCCESS ? "false" : "true"
-            });
 
             apf.xmldb.removeAttribute(node, "saving");
             apf.xmldb.removeAttribute(node, "new");
@@ -313,7 +303,7 @@ module.exports = ext.register("ext/save/save", {
             this.saveBuffer[path] = page;
             return;
         }
-        apf.xmldb.setAttribute(file, "saving", "1");
+        apf.xmldb.setAttribute(node, "saving", "1");
 
         var self = this;
         var panel = sbMain.firstChild;
@@ -330,10 +320,10 @@ module.exports = ext.register("ext/save/save", {
             var node = model.getXml();
             var doc = page.$doc;
 
-            if (path !== newPath || parseInt(node.getAttribute("newfile") || 0, 10) === 1) {
+            if (path !== newPath || node.getAttribute("newfile") === 1) {
                 model.load(node);
                 file = model.data;
-                fs.beforeRename(file, null, newPath, false);
+                fs.beforeRename(file, null, newPath);
                 doc.setNode(file);
             }
 
@@ -344,7 +334,7 @@ module.exports = ext.register("ext/save/save", {
                 self._saveAsNoUI(page);
             }
 
-            if (parseInt(file.getAttribute("newfile") || "0", 10) === 1) {
+            if (file.getAttribute("newfile") === 1) {
                 apf.xmldb.removeAttribute(file, "newfile");
                 apf.xmldb.removeAttribute(file, "changed");
                 var xpath = newPath.replace(new RegExp("\/" + cloud9config.davPrefix.split("/")[1]), "")
@@ -431,8 +421,7 @@ module.exports = ext.register("ext/save/save", {
             this.saveBuffer[path] = page;
             return;
         }
-
-        //apf.xmldb.setAttribute(file, "saving", "1");
+        apf.xmldb.setAttribute(node, "saving", "1");
 
         var self = this;
         var doSave = function() {
@@ -441,7 +430,7 @@ module.exports = ext.register("ext/save/save", {
             self._saveAsNoUI(page, path, newPath);
         };
 
-        if (path !== newPath || parseInt(file.getAttribute("newfile") || 0, 10) === 1) {
+        if (path !== newPath || file.getAttribute("newfile") === 1) {
             fs.exists(newPath, function (exists) {
                 if (exists) {
                     var name = newPath.match(/\/([^/]*)$/)[1];

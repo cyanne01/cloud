@@ -341,7 +341,6 @@ function clearSplitViewStyles(splitOrPage) {
 }
 
 module.exports = ext.register("ext/splitview/splitview", {
-    name     : "Split View",
     dev      : "Ajax.org",
     alone    : true,
     type     : ext.GENERAL,
@@ -362,7 +361,7 @@ module.exports = ext.register("ext/splitview/splitview", {
         
         var parent = Tabbehaviors.nodes[Tabbehaviors.nodes.length - 1];
         this.nodes.push(
-            parent.appendChild(new apf.divider()),
+            parent.appendChild(new apf.splitter()),
             parent.appendChild(
                 (mnuCloneView = new apf.item({
                     caption : "Clone Editor",

@@ -4,21 +4,13 @@
  * @copyright 2010, Ajax.org B.V.
  * @license GPLv3 <http://www.gnu.org/licenses/gpl.txt>
  */
-
+ 
 define(function(require, exports, module) {
 
 var ide = require("core/ide");
 var ext = require("core/ext");
 var code = require("ext/code/code");
 var markup = require("text!ext/html/html.xml");
-
-var mimeTypes = [
-    "text/html",
-    "application/xhtml+xml",
-    "text/javascript",
-    "text/plain",
-    "application/xml"
-];
 
 module.exports = ext.register("ext/html/html", {
     name    : "HTML Editor",
@@ -32,19 +24,13 @@ module.exports = ext.register("ext/html/html", {
     hook : function(){
         var _self = this;
         tabEditors.addEventListener("afterswitch", function(e){
-            if (e.nextPage) {
-            /*var ext = e.nextPage.id.split(".").pop();
-
-            if (ext == ".html" || ext == ".shtml"
-              || ext == ".js" || ext == ".txt"
-              || ext == ".xml") {*/
+            var mime = e.nextPage.contentType;
+            if (mime == "text/html" || mime == "application/xhtml+xml"
+              || mime == "text/javascript" || mime == "text/plain"
+              || mime == "application/xml") {
                 ext.initExtension(_self);
                 _self.page = e.nextPage;
                 _self.enable();
-            /*}
-            else {
-                _self.disable();
-            }*/
             }
             else {
                 _self.disable();
@@ -55,11 +41,9 @@ module.exports = ext.register("ext/html/html", {
     init : function() {
         //Append the button bar to the main toolbar
         var nodes = barHtmlMode.childNodes;
-        var node;
-        for (var i = nodes.length - 1; i >= 0; i--) {
+        for (var node, i = nodes.length - 1; i >= 0; i--) {
             node = ide.barTools.appendChild(nodes[0]);
-            if (node.nodeType != 1)
-                continue;
+            if (node.nodeType != 1) continue;
             this.nodes.push(node);
         }
 

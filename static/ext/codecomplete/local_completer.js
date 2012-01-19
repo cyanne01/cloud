@@ -1,15 +1,9 @@
 define(function(require, exports, module) {
 
-var baseLanguageHandler = require('ext/language/base_handler');
 var completeUtil = require("ext/codecomplete/complete_util");
 
+var ID_REGEX = /[a-zA-Z_0-9\$]/;
 var SPLIT_REGEX = /[^a-zA-Z_0-9\$]+/;
-
-var completer = module.exports = Object.create(baseLanguageHandler);
-    
-completer.handlesLanguage = function(language) {
-    return true;
-};
 
 // For the current document, gives scores to identifiers not on frequency, but on distance from the current prefix
 function wordDistanceAnalyzer(doc, pos, prefix) {
@@ -24,7 +18,6 @@ function wordDistanceAnalyzer(doc, pos, prefix) {
     // Split entire document into words
     var identifiers = text.split(SPLIT_REGEX);
     var identDict = {};
-    
     // Find prefix to find other identifiers close it
     for (var i = 0; i < identifiers.length; i++) {
         var ident = identifiers[i];
@@ -39,35 +32,35 @@ function wordDistanceAnalyzer(doc, pos, prefix) {
     return identDict;
 }
 
-function analyze(doc, pos) {
-    var line = doc.getLine(pos.row);
-    var identifier = completeUtil.retrievePreceedingIdentifier(line, pos.column);
-    
-    var analysisCache = wordDistanceAnalyzer(doc, pos, identifier);
-    // Remove the word to be completed
-    delete analysisCache[identifier];
-    return analysisCache;
-}
-
-/**
- * Returns whether the completion engine requires an AST representation of the code
- */
-completer.completionRequiresParsing = function() {
-    return false;
+exports.hook = function() {
 };
-    
-completer.complete = function(doc, fullAst, pos, currentNode) {
-    var identDict = analyze(doc, pos);
-    var line = doc.getLine(pos.row);
+
+exports.analyze = function(editor, callback) {
+    var pos = editor.getCursorPosition();
+    var line = editor.getSession().getLine(pos.row);
     var identifier = completeUtil.retrievePreceedingIdentifier(line, pos.column);
+    var doc = editor.getSession().getDocument();
+    
+    editor.lcAnalysisCache = wordDistanceAnalyzer(doc, pos, identifier);
+    // Remove the word to be completed
+    delete editor.lcAnalysisCache[identifier];
+
+    callback();
+};
+
+exports.complete = function(editor, callback) {
+    var pos = editor.getCursorPosition();
+    var line = editor.getSession().getLine(pos.row);
+    var identifier = completeUtil.retrievePreceedingIdentifier(line, pos.column);
+    var identDict = editor.lcAnalysisCache;
     
     var allIdentifiers = [];
-    for (var ident in identDict) {
+    for(var ident in identDict) {
         allIdentifiers.push(ident);
     }
     var matches = completeUtil.findCompletions(identifier, allIdentifiers);
 
-    return matches.map(function(m) {
+    callback(matches.map(function(m) {
         return {
           name        : m,
           replaceText : m,
@@ -76,7 +69,7 @@ completer.complete = function(doc, fullAst, pos, currentNode) {
           meta        : "",
           priority    : 1
         };
-    });
+    }));
 };
 
 });

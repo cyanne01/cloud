@@ -7,8 +7,6 @@
  
 define(function(require, exports, module) {
 
-require("apf/elements/codeeditor");
-
 var ide = require("core/ide");
 var ext = require("core/ext");
 var editors = require("ext/editors/editors");
@@ -29,10 +27,12 @@ module.exports = ext.register("ext/debugger/debugger", {
     buttonClassName : "debug1",
     deps    : [fs, noderunner],
     commands: {
-        "resume"   : {hint: "resume the current paused process"},
-        "stepinto" : {hint: "step into the function that is next on the execution stack"},
-        "stepover" : {hint: "step over the current expression on the execution stack"},
-        "stepout"  : {hint: "step out of the current function scope"}
+        "debug": {
+            "hint": "run and debug a node program on the server",
+            "commands": {
+                "[PATH]": {"hint": "path pointing to an executable. Autocomplete with [TAB]"}
+            }
+        }
     },
     
     nodesAll: [],
@@ -42,7 +42,7 @@ module.exports = ext.register("ext/debugger/debugger", {
     hook : function(){
         var _self = this;
         
-        /*ide.addEventListener("consolecommand.debug", function(e) {
+        ide.addEventListener("consolecommand.debug", function(e) {
             ide.send(JSON.stringify({
                 command: "internal-isfile",
                 argv: e.data.argv,
@@ -50,18 +50,14 @@ module.exports = ext.register("ext/debugger/debugger", {
                 sender: "debugger"
             }));
             return false;
-        });*/
+        });
         
         ide.addEventListener("loadsettings", function (e) {
             // restore the breakpoints from the IDE settings
             var bpFromIde = e.model.data.selectSingleNode("//breakpoints");
-            // not there yet, create element
-            if (!bpFromIde) {
-                bpFromIde = e.model.data.ownerDocument.createElement("breakpoints");
-                e.model.data.appendChild(bpFromIde);
-            }           
-            // bind it to the Breakpoint model
-            mdlDbgBreakpoints.load(bpFromIde);
+            if (bpFromIde) {
+                mdlDbgBreakpoints.load(bpFromIde);
+            }
         });
         
         stDebugProcessRunning.addEventListener("activate", function() {
@@ -82,70 +78,31 @@ module.exports = ext.register("ext/debugger/debugger", {
         });
         
         var name = "ext/debugger/debugger"; //this.name
-
+        
         dock.addDockable({
-            expanded : -1,
-            width    : 300,
-            sections : [
-                {
-                    height     : 30,
-                    width      : 150,
-                    noflex     : true,
-                    draggable  : false,
-                    resizable  : false,
-                    skin       : "dockwin_runbtns",
-                    noTab      : true,
-                    position   : 1,
-                    
-                    buttons : [{
-                        id      : "btnRunCommands",
-                        caption : "Run Commands", 
-                        "class" : "btn-runcommands",
-                        ext     : [name, "pgDebugNav"],
-                        draggable: false,
-                        hidden  : true
-                    }]
-                },
-                {
-                    width : 250,
-                    height : 300,
-                    buttons : [
-                        { caption: "Call Stack", ext : [name, "dbgCallStack"], hidden: true}
-                    ]
-                },
-                {
-                    width : 250,
-                    height : 300,
-                    buttons : [
-                        { caption: "Interactive", ext : [name, "dbInteractive"], hidden: true},
-                        { caption: "Variables", ext : [name, "dbgVariable"], hidden: true},
-                        { caption: "Breakpoints", ext : [name, "dbgBreakpoints"], hidden: true}
-                    ]
-                }
+            hidden  : false,
+            buttons : [
+                { caption: "Call Stack", ext : [name, "dbgCallStack"] }
             ]
         });
-        
-        dock.register(name, "pgDebugNav", {
-            menu : "Run Commands",
-            primary : {
-                backgroundImage: ide.staticPrefix + "/style/images/debugicons.png",
-                defaultState: { x: -6, y: -265 },
-                activeState: { x: -6, y: -265 }
-            }
-        }, function(type) {
-            ext.initExtension(_self);
-            return pgDebugNav;
+        dock.addDockable({
+            hidden  : false,
+            buttons : [
+                { caption: "Interactive", ext : [name, "dbInteractive"] },
+                { caption: "Variables", ext : [name, "dbgVariable"] },
+                { caption: "Breakpoints", ext : [name, "dbgBreakpoints"] }
+            ]
         });
 
         dock.register(name, "dbgCallStack", {
             menu : "Debugger/Call Stack",
             primary : {
                 backgroundImage: ide.staticPrefix + "/style/images/debugicons.png",
-                defaultState: { x: -8, y: -47 },
-                activeState: { x: -8, y: -47 }
+                defaultState: { x: -6, y: -217 },
+                activeState: { x: -6, y: -217 }
             }
         }, function(type) {
-            ext.initExtension(_self);
+            ext.initExtension(_self);            
             return dbgCallStack;
         });
         
@@ -153,8 +110,8 @@ module.exports = ext.register("ext/debugger/debugger", {
             menu : "Debugger/Interactive",
             primary : {
                 backgroundImage: ide.staticPrefix + "/style/images/debugicons.png",
-                defaultState: { x: -8, y: -130 },
-                activeState: { x: -8, y: -130 }
+                defaultState: { x: -7, y: -310 },
+                activeState: { x: -7, y: -310 }
             }
         }, function(type) {
             ext.initExtension(_self);
@@ -165,17 +122,15 @@ module.exports = ext.register("ext/debugger/debugger", {
             menu : "Debugger/Variables",
             primary : {
                 backgroundImage: ide.staticPrefix + "/style/images/debugicons.png",
-                defaultState: { x: -8, y: -174 },
-                activeState: { x: -8, y: -174 }
+                defaultState: { x: -6, y: -261 },
+                activeState: { x: -6, y: -261 }
             }
         }, function(type) {
             ext.initExtension(_self);
             
-            // Why is this code here? This is super hacky and has lots of 
-            // unwanted side effects (Ruben)
             // when visible -> make sure to refresh the grid
             dbgVariable.addEventListener("prop.visible", function(e) {
-                if (e.value && self.dgVars) {
+                if (e.value) {
                     dgVars.reload();
                 }
             });
@@ -187,8 +142,8 @@ module.exports = ext.register("ext/debugger/debugger", {
             menu : "Debugger/Breakpoints",
             primary : {
                 backgroundImage: ide.staticPrefix + "/style/images/debugicons.png",
-                defaultState: { x: -8, y: -88 },
-                activeState: { x: -8, y: -88 }
+                defaultState: { x: -6, y: -360 },
+                activeState: { x: -6, y: -360 }
             }
         }, function(type) {
             ext.initExtension(_self);
@@ -198,6 +153,25 @@ module.exports = ext.register("ext/debugger/debugger", {
 
     init : function(amlNode){
         var _self = this;
+
+        while (tbDebug.childNodes.length) {
+            var button = tbDebug.firstChild;
+
+            if (button.nodeType == 1 && button.getAttribute("id") == "btnDebug")
+                ide.barTools.insertBefore(button, btnRun);
+            else
+                ide.barTools.appendChild(button);
+            
+            //collect all the elements that are normal nodes
+            if (button.nodeType == 1) {
+                this.nodesAll.push(button);
+            }
+        }
+
+        this.hotitems["resume"]   = [btnResume];
+        this.hotitems["stepinto"] = [btnStepInto];
+        this.hotitems["stepover"] = [btnStepOver];
+        this.hotitems["stepout"]  = [btnStepOut];
 
         this.paths = {};
 
@@ -222,15 +196,6 @@ module.exports = ext.register("ext/debugger/debugger", {
             e.data && _self.showDebugFile(e.data.getAttribute("scriptid"));
         });
         
-        pgDebugNav.addEventListener("afterrender", function(){
-            _self.hotitems["resume"]   = [btnResume];
-            _self.hotitems["stepinto"] = [btnStepInto];
-            _self.hotitems["stepover"] = [btnStepOver];
-            _self.hotitems["stepout"]  = [btnStepOut];
-            
-            require("ext/keybindings/keybindings").update(_self);
-        });
-        
         dbgBreakpoints.addEventListener("afterrender", function(){
             lstBreakpoints.addEventListener("afterselect", function(e) {
                 if (e.selected && e.selected.getAttribute("scriptid"))
@@ -246,7 +211,7 @@ module.exports = ext.register("ext/debugger/debugger", {
                     .showDebugFile(e.selected.getAttribute("scriptid"));
             });
         });
-        
+
         ide.addEventListener("afterfilesave", function(e) {
             var node = e.node;
             var doc = e.doc;
@@ -276,11 +241,6 @@ module.exports = ext.register("ext/debugger/debugger", {
 
     showDebugFile : function(scriptId, row, column, text) {
         var file = fs.model.queryNode("//file[@scriptid='" + scriptId + "']");
-        
-        // check prerequisites
-        if (self.ceEditor && !ceEditor.$updateMarkerPrerequisite()) {
-            return;
-        }
 
         if (file) {
             editors.jump(file, row, column, text, null, true);
@@ -395,7 +355,7 @@ module.exports = ext.register("ext/debugger/debugger", {
         if (this.disabled) return;
         
         //stop debugging
-        require('ext/runpanel/runpanel').stop();
+        require('ext/run/run').stop();
         this.deactivate();
         
         //loop from each item of the plugin and disable it

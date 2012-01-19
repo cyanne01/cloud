@@ -5,13 +5,14 @@
 
 define(function(require, exports, module) {
 
+var ide = require("core/ide");
 var keys = require("ext/keybindings/keybindings");
 
 return keys.onLoad({
     "ext" : {
         "console" : {
             "switchconsole": "Shift-Esc"
-        },
+        },        
         "save" : {
             "quicksave": "Ctrl-S",
             "saveas": "Ctrl-Shift-S",
@@ -29,15 +30,11 @@ return keys.onLoad({
         "quickwatch": {
             "quickwatch": "Ctrl-Q"
         },
-        "runpanel": {
-            "run" : "Ctrl-F5",
-            "stop" : "Shift-F5"
-        },
-        "debugger": {
+        "run": {
             "resume": "F8",
-            "stepinto": "F11",
+            "stepinto": "F9",
             "stepover": "F10",
-            "stepout": "Shift-F11"
+            "stepout": "Shift-F9"
         },
         "zen": {
             "zen": "Ctrl-E",
@@ -95,9 +92,6 @@ return keys.onLoad({
             "nexttab": "Ctrl-Tab",
             "previoustab": "Ctrl-Shift-Tab"
         },
-        "tabsessions" : {
-            "savetabsession": "Ctrl-Alt-S"
-        },
         "splitview" : {
             "mergetableft": "Ctrl-Alt-[",
             "mergetabright": "Ctrl-Alt-]"
@@ -148,10 +142,6 @@ return keys.onLoad({
             "backspace": "Backspace",
             "outdent": "Shift-Tab",
             "indent": "Tab"
-        },
-        "language": {
-            "complete": "Ctrl-Space|Alt-Space",
-            "renameVar": "Ctrl-Alt-R"
         }
     }
 });

@@ -9,6 +9,7 @@ define(function(require, exports, module) {
 
 var ide = require("core/ide");
 var ext = require("core/ext");
+var util = require("core/util");
 var fs = require("ext/filesystem/filesystem");
 var settings = require("ext/settings/settings");
 var panels = require("ext/panels/panels");
@@ -20,19 +21,106 @@ module.exports = ext.register("ext/tree/tree", {
     alone            : true,
     type             : ext.GENERAL,
     markup           : markup,
-
-    defaultWidth     : 200,
-
+    visible          : true,
     deps             : [fs],
-
     currentSettings  : [],
     expandedList     : {},
     loading          : false,
     changed          : false,
+    sbIsFaded        : false,
+    ignoreSBMouseOut : false,
+    pendingSBFadeOut : false,
     animControl      : {},
-    nodes            : [],
 
-    "default"        : true,
+    onSBMouseOver : function() {
+        if (this.ignoreSBMouseOut)
+            this.pendingSBFadeOut = false;
+        this.showScrollbar();
+    },
+
+    onSBMouseOut : function() {
+        if (this.ignoreSBMouseOut)
+            this.pendingSBFadeOut = true;
+
+        clearTimeout(this.sbTimer);
+        var _self = this;
+        this.sbTimer = setTimeout(function(){
+            _self.hideScrollbar();
+        }, 300);
+    },
+
+    onSBMouseDown : function() {
+        this.ignoreSBMouseOut = true;
+    },
+
+    onSBMouseUp : function() {
+        this.ignoreSBMouseOut = false;
+        if (this.pendingSBFadeOut) {
+            this.pendingSBFadeOut = false;
+            this.hideScrollbar();
+        }
+    },
+
+    onTreeOver : function() {
+        if (this.ignoreSBMouseOut)
+            this.pendingSBFadeOut = false;
+        this.showScrollbar();
+    },
+
+    onTreeOut : function() {
+        if (this.ignoreSBMouseOut)
+            this.pendingSBFadeOut = true;
+            
+        clearTimeout(this.sbTimer);
+        var _self = this;
+        this.sbTimer = setTimeout(function(){
+            _self.hideScrollbar();
+        }, 300);
+    },
+
+    showScrollbar : function() {
+        if (this.sbTimer)
+            clearTimeout(this.sbTimer);
+            
+        if (this.sbIsFaded) {
+            if (this.animControl.state != apf.tween.STOPPED && this.animControl.stop)
+                this.animControl.stop();
+
+            apf.tween.single(sbTrFiles, {
+                type     : "fade",
+                anim     : apf.tween.EASEIN,
+                from     : 0,
+                to       : 1,
+                steps    : 20,
+                control  : this.animControl = {}
+            });
+
+            this.sbIsFaded = false;
+        }
+    },
+
+    hideScrollbar : function() {
+        if (this.ignoreSBMouseOut)
+            return;
+
+        clearTimeout(this.sbTimer);
+        if (this.sbIsFaded === false) {
+            var _self = this;
+            this.sbTimer = setTimeout(function() {
+                if (_self.animControl.state != apf.tween.STOPPED && _self.animControl.stop)
+                    _self.animControl.stop();
+                apf.tween.single(sbTrFiles, {
+                    type     : "fade",
+                    anim     : apf.tween.EASEOUT,
+                    from     : 1,
+                    to       : 0,
+                    steps    : 20,
+                    control  : _self.animControl = {}
+                });
+                _self.sbIsFaded = true;
+            }, _self.animControl.state != apf.tween.RUNNING ? 20 : 200);
+        }
+    }, 
 
     //@todo deprecated?
     getSelectedPath: function() {
@@ -40,10 +128,32 @@ module.exports = ext.register("ext/tree/tree", {
     },
 
     hook : function(){
-        panels.register(this, {
-            position : 1000,
-            caption: "Project Files",
-            "class": "project_files"
+        panels.register(this);
+
+        var btn = this.button = navbar.insertBefore(new apf.button({
+            skin    : "mnubtn",
+            state   : "true",
+            value   : "true",
+            "class" : "project_files",
+            caption : "Project Files"
+        }), navbar.firstChild);
+        navbar.current = this;
+
+        var _self = this;
+        btn.addEventListener("mousedown", function(e){
+            var value = this.value;
+            if (navbar.current && (navbar.current != _self || value)) {
+                navbar.current.disable(navbar.current == _self);
+                if (value)
+                    return;
+            }
+
+            panels.initPanel(_self);
+            _self.enable(true);
+        });
+        
+        ide.addEventListener("filecallback", function (e) {
+            _self.refresh();
         });
     },
 
@@ -51,8 +161,9 @@ module.exports = ext.register("ext/tree/tree", {
         var _self = this;
 
         this.panel = winFilesViewer;
-
-        this.nodes.push(winFilesViewer);
+        
+        apf.setOpacity(sbTrFiles.$ext, 0);
+        this.sbIsFaded = true;
 
         colLeft.addEventListener("hide", function(){
             splitterPanelLeft.hide();
@@ -64,27 +175,21 @@ module.exports = ext.register("ext/tree/tree", {
 
         colLeft.appendChild(winFilesViewer);
 
-        mnuFilesSettings.appendChild(new apf.item({
+        mnuView.appendChild(new apf.divider());
+        mnuView.appendChild(new apf.item({
             id      : "mnuitemHiddenFiles",
             type    : "check",
             caption : "Show Hidden Files",
-            visible : "{trFiles.visible}",
             checked : "[{require('ext/settings/settings').model}::auto/tree/@showhidden]",
             onclick : function(){
                 _self.changed = true;
-                (davProject.realWebdav || davProject)
-                    .setAttribute("showhidden", this.checked);
-
-                _self.refresh();
-                settings.save();
+                require(["ext/tree/tree", "ext/settings/settings"], function(tree, settings) {
+                    tree.refresh();
+                    settings.save();
+                })
             }
         }));
-
-        ide.addEventListener("loadsettings", function(e) {
-            var model = e.model;
-            (davProject.realWebdav || davProject).setAttribute("showhidden",
-                apf.isTrue(model.queryValue('auto/tree/@showhidden')));
-        });
+        davProject.setAttribute("showhidden", "[{require('ext/settings/settings').model}::auto/tree/@showhidden]");
 
         mnuView.appendChild(new apf.divider());
 
@@ -112,8 +217,7 @@ module.exports = ext.register("ext/tree/tree", {
 
         trFiles.addEventListener("afterchoose", this.$afterselect = function(e) {
             var node = this.selected;
-            if (!node || node.tagName != "file" || this.selection.length > 1
-              || !ide.onLine && !ide.offlineFileSystemSupport) //ide.onLine can be removed after update apf
+            if (!node || node.tagName != "file" || this.selection.length > 1 || !ide.onLine && !ide.offlineFileSystemSupport) //ide.onLine can be removed after update apf
                     return;
 
             ide.dispatchEvent("openfile", {doc: ide.createDocument(node)});
@@ -133,7 +237,7 @@ module.exports = ext.register("ext/tree/tree", {
             args[1].setAttribute("newname", filename);
 
             setTimeout(function () {
-                fs.beforeRename(args[1], null, args[0].getAttribute("path").replace(/[\/]+$/, "") + "/" + filename, true);
+                fs.beforeRename(args[1], null, args[0].getAttribute("path").replace(/[\/]+$/, "") + "/" + filename);
                 args[1].removeAttribute("newname");
             });
         });
@@ -204,10 +308,6 @@ module.exports = ext.register("ext/tree/tree", {
         ide.addEventListener("afteronline", function(e){
             //trFiles.enable();
             //mnuCtxTree.enable();
-        });
-
-        ide.addEventListener("filecallback", function (e) {
-            _self.refresh();
         });
 
         /**** Support for state preservation ****/
@@ -425,24 +525,34 @@ module.exports = ext.register("ext/tree/tree", {
         }
     },
 
-    enable : function(){
-        this.nodes.each(function(item){
-            item.enable();
-        });
+    enable : function(noButton){
+        winFilesViewer.show();
+        colLeft.show();
+        if (!noButton) {
+            this.button.setValue(true);
+            if(navbar.current && (navbar.current != this))
+                navbar.current.disable(false);
+        }
+
+        splitterPanelLeft.show();
+        navbar.current = this;
     },
 
-    disable : function(){
-        this.nodes.each(function(item){
-            item.disable();
-        });
+    disable : function(noButton){
+        if (self.winFilesViewer)
+            winFilesViewer.hide();
+        if (!noButton)
+            this.button.setValue(false);
+
+        splitterPanelLeft.hide();
     },
 
     destroy : function(){
+        davProject.destroy(true, true);
+        mdlFiles.destroy(true, true);
+        trFiles.destroy(true, true);
+
         trFiles.removeEventListener("afterselect", this.$afterselect);
-        this.nodes.each(function(item){
-            item.destroy(true, true);
-        });
-        this.nodes = [];
 
         panels.unregister(this);
     }

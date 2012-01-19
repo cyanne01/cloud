@@ -6,7 +6,6 @@
       syntax            = "{require('ext/code/code').getSyntax(%[.])}"
       theme             = "[{require('ext/settings/settings').model}::editors/code/@theme]"
       overwrite         = "[{require('ext/settings/settings').model}::editors/code/@overwrite]"
-      folding           = "[{require('ext/settings/settings').model}::editors/code/@folding]"
       behaviors         = "[{require('ext/settings/settings').model}::editors/code/@behaviors]"
       selectstyle       = "[{require('ext/settings/settings').model}::editors/code/@selectstyle]"
       activeline        = "[{require('ext/settings/settings').model}::editors/code/@activeline]"
@@ -18,7 +17,7 @@
       scrollspeed       = "[{require('ext/settings/settings').model}::editors/code/@scrollspeed]"
       
       fontsize          = "[{require('ext/settings/settings').model}::editors/code/@fontsize]"
-      wrapmode          = "[@wrapmode]"
+      wrapmode          = "[{require('ext/settings/settings').model}::editors/code/@wrapmode]"
       wraplimitmin      = "80"
       wraplimitmax      = "80"
       gutter            = "[{require('ext/settings/settings').model}::editors/code/@gutter]"

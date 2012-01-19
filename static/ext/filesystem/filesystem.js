@@ -38,14 +38,8 @@ module.exports = ext.register("ext/filesystem/filesystem", {
     },
 
     saveFile : function(path, data, callback) {
-        if (!this.webdav)
-            return;
-        this.webdav.write(path, data, null, function(data, state, extra) {
-            if ((state == apf.ERROR && extra.status == 400 && extra.retries < 3) || state == apf.TIMEOUT)
-                return extra.tpModule.retry(extra.id);
-
-            callback(data, state, extra);
-        });
+        if (this.webdav)
+            this.webdav.write(path, data, null, callback);
     },
 
     list : function(path, callback) {
@@ -66,10 +60,8 @@ module.exports = ext.register("ext/filesystem/filesystem", {
         }
 
         var node = tree.selected;
-        if (!node && tree.xmlRoot)
-            node = tree.xmlRoot.selectSingleNode("folder");
         if (!node)
-            return;
+            node = tree.xmlRoot.selectSingleNode("folder");
         if (node.getAttribute("type") != "folder" && node.tagName != "folder")
             node = node.parentNode;
 
@@ -100,7 +92,7 @@ module.exports = ext.register("ext/filesystem/filesystem", {
 
                         tree.slideOpen(null, node, true, function(data, flag, extra){
                             var folder;
-                            // empty data means it didn't trigger <insert> binding,
+                            // empty data means it didn't trigger <insert> binding, 
                             // therefore the node was expanded already
                             if (!data)
                                 tree.add(apf.getXml(strXml), node);
@@ -122,7 +114,7 @@ module.exports = ext.register("ext/filesystem/filesystem", {
     createFile: function(filename, newFile) {
         var node;
 
-        if (!newFile) {
+        if(!newFile) {
             node = trFiles.selected;
             if (!node)
                 node = trFiles.xmlRoot.selectSingleNode("folder");
@@ -216,9 +208,10 @@ module.exports = ext.register("ext/filesystem/filesystem", {
         return match !== null && match[0] == name;
     },
 
-    beforeRename : function(node, name, newPath, isCopyAction) {
+    beforeRename : function(node, name, newPath) {
         var path = node.getAttribute("path");
         var page = tabEditors.getPage(path);
+        var match;
 
         if (name)
             newPath = path.replace(/^(.*\/)[^\/]+$/, "$1" + name);
@@ -228,9 +221,7 @@ module.exports = ext.register("ext/filesystem/filesystem", {
         node.setAttribute("oldpath", node.getAttribute("path"));
         node.setAttribute("path", newPath);
         apf.xmldb.setAttribute(node, "name", name);
-
-        // when this is a copy action, then we don't want this to happen
-        if (page && !isCopyAction)
+        if (page)
             page.setAttribute("id", newPath);
 
         var childNodes = node.childNodes;
@@ -240,10 +231,10 @@ module.exports = ext.register("ext/filesystem/filesystem", {
             var childNode = childNodes[i];
             if(!childNode || childNode.nodeType != 1)
                 continue;
-
+            
             // The 'name' variable is redeclared here for some fucked up reason.
             // The problem is that we are reusing that variable below. If the author
-            // of this would be so kind to fix this code as soon as he sees this
+            // of this would be so kind to fix this code as soon as he sees this 
             // comment, I would be eternally grateful. Sergi.
             var name = childNode.getAttribute("name");
 
@@ -251,7 +242,7 @@ module.exports = ext.register("ext/filesystem/filesystem", {
         }
         ide.dispatchEvent("updatefile", {
             path: path,
-            filename: name && name.input,
+            name: name.input,
             xmlNode: node
         });
     },
@@ -332,7 +323,11 @@ module.exports = ext.register("ext/filesystem/filesystem", {
         });
 
         var _self = this;
-        _self.model.load("<data><folder type='folder' name='" + ide.projectName
+        /*ide.addEventListener("afteronline", function(){
+            console.log("ONLINE, INITIAL DATA IN");
+            ide.removeEventListener("afteronline", arguments.callee);
+        });*/
+        _self.model.load("<data><folder type='folder' name='" + ide.projectName 
             + "' path='" + ide.davPrefix + "' root='1'/></data>");
 
         var dav_url = location.href.replace(location.pathname + location.hash, "") + ide.davPrefix;
@@ -343,24 +338,32 @@ module.exports = ext.register("ext/filesystem/filesystem", {
                 ide.dispatchEvent("authrequired");
             }
         });
+        var url = "{davProject.getroot()}";
+
+        /*this.webdav.$undoFlag = false;
+        this.webdav.addEventListener("error", function(event) {
+            return util.alert("Webdav Exception", event.error.type || "", event.error.message, function() {
+                trFiles.getActionTracker().undo();
+                _self.webdav.$undoFlag = true;
+            });
+        });*/
 
         function openHandler(e) {
-            /*ide.send(JSON.stringify({
+            ide.send(JSON.stringify({
                 command: "internal-isfile",
                 argv: e.data.argv,
                 cwd: e.data.cwd,
                 sender: "filesystem"
-            }));*/
+            }));
             return false;
         }
-        /*ide.addEventListener("consolecommand.open", openHandler);
-        ide.addEventListener("consolecommand.c9",   openHandler);*/
+        ide.addEventListener("consolecommand.open", openHandler);
+        ide.addEventListener("consolecommand.c9",   openHandler);
 
         var fs = this;
         ide.addEventListener("openfile", function(e){
             var doc  = e.doc;
             var node = doc.getNode();
-            var editor = e.doc.$page && e.doc.$page.$editor;
 
             apf.xmldb.setAttribute(node, "loading", "true");
             ide.addEventListener("afteropenfile", function(e) {
@@ -371,14 +374,14 @@ module.exports = ext.register("ext/filesystem/filesystem", {
             });
 
             if (doc.hasValue()) {
-                ide.dispatchEvent("afteropenfile", {doc: doc, node: node, editor: editor});
+                ide.dispatchEvent("afteropenfile", {doc: doc, node: node});
                 return;
             }
 
             if (doc.cachedValue) {
                 doc.setValue(doc.cachedValue);
                 delete doc.cachedValue;
-                ide.dispatchEvent("afteropenfile", {doc: doc, node: node, editor: editor});
+                ide.dispatchEvent("afteropenfile", {doc: doc, node: node});
             }
             else if ((!e.type || e.type != "newfile") && node.getAttribute("newfile") != 1) {
                 // add a way to hook into loading of files
@@ -409,7 +412,7 @@ module.exports = ext.register("ext/filesystem/filesystem", {
                     }
                     else {
                         doc.setValue(data);
-                        ide.dispatchEvent("afteropenfile", {doc: doc, node: node, editor: editor});
+                        ide.dispatchEvent("afteropenfile", {doc: doc, node: node});
                     }
                 };
 
@@ -417,7 +420,7 @@ module.exports = ext.register("ext/filesystem/filesystem", {
             }
             else {
                 doc.setValue("");
-                ide.dispatchEvent("afteropenfile", {doc: doc, node: node, editor: editor});
+                ide.dispatchEvent("afteropenfile", {doc: doc, node: node});
             }
         });
 

@@ -4,7 +4,7 @@
  * @copyright 2010, Ajax.org B.V.
  * @license GPLv3 <http://www.gnu.org/licenses/gpl.txt>
  */
-
+ 
 define(function(require, exports, module) {
 
 var ide = require("core/ide");
@@ -19,11 +19,7 @@ module.exports = ext.register("ext/gotoline/gotoline", {
     dev     : "Ajax.org",
     type    : ext.GENERAL,
     alone   : true,
-    skin     : {
-        id   : "gotoline",
-        data : skin,
-        "media-path" : ide.staticPrefix + "/ext/gotoline/images/"
-    },
+    skin    : skin,
     markup  : markup,
     commands : {
         "gotoline": {hint: "enter a linenumber and jump to it in the active document"}
@@ -37,7 +33,7 @@ module.exports = ext.register("ext/gotoline/gotoline", {
         this.nodes.push(
             mnuEdit.appendChild(new apf.divider()),
             mnuEdit.appendChild(new apf.item({
-                caption : "Go to Line...",
+                caption : "Go to Line",
                 onclick : function(){
                     _self.gotoline(1);
                 }
@@ -50,20 +46,19 @@ module.exports = ext.register("ext/gotoline/gotoline", {
                 _self.gotoline(1);
             }
         });
-
-        this.hotitems.gotoline = [this.nodes[1]];
+        
+        this.hotitems["gotoline"] = [this.nodes[1]];
     },
 
     init : function(amlNode) {
         var _self = this;
-
+        
         lstLineNumber.addEventListener("afterchoose", function() {
             if (lstLineNumber.selected) {
                 _self.execGotoLine(parseInt(lstLineNumber.selected.getAttribute("nr"), 10));
             }
-            else {
+            else
                 _self.execGotoLine();
-            }
         });
         lstLineNumber.addEventListener("afterselect", function() {
             if (this.selected)
@@ -108,7 +103,7 @@ module.exports = ext.register("ext/gotoline/gotoline", {
             else if ((e.keyCode > 57 || e.keyCode == 32) && (e.keyCode < 96 || e.keyCode > 105))
                 return false;
         });
-
+        
         winGotoLine.addEventListener("blur", function(e){
             if (!apf.isChildOf(winGotoLine, e.toElement))
                 _self.gotoline(-1);
@@ -117,7 +112,7 @@ module.exports = ext.register("ext/gotoline/gotoline", {
 
     gotoline: function(force) {
         ext.initExtension(this);
-
+        
         if (this.control && this.control.stop)
             this.control.stop();
 
@@ -132,22 +127,22 @@ module.exports = ext.register("ext/gotoline/gotoline", {
             var ace = editor.ceEditor.$editor;
             var aceHtml = editor.ceEditor.$ext;
             var cursor = ace.getCursorPosition();
-
+            
             //Set the current line
             txtLineNr.setValue(txtLineNr.getValue() || cursor.row + 1);
-
+                
             //Determine the position of the window
             var pos = ace.renderer.textToScreenCoordinates(cursor.row, cursor.column);
             var epos = apf.getAbsolutePosition(aceHtml);
             var maxTop = aceHtml.offsetHeight - 100;
-
+            
             editor.ceEditor.parentNode.appendChild(winGotoLine);
             winGotoLine.setAttribute("top", Math.min(maxTop, pos.pageY - epos[1]));
             winGotoLine.setAttribute("left", -60);
-
+            
             winGotoLine.show();
             txtLineNr.focus();
-
+            
             //Animate
             apf.tween.single(winGotoLine, {
                 type     : "left",
@@ -183,7 +178,7 @@ module.exports = ext.register("ext/gotoline/gotoline", {
         var editor = require('ext/editors/editors').currentEditor;
         if (!editor || !editor.ceEditor)
             return;
-
+        
         var ceEditor = editor.ceEditor;
         var ace      = ceEditor.$editor;
 
@@ -197,10 +192,10 @@ module.exports = ext.register("ext/gotoline/gotoline", {
         if (lineEl)
             gotoline = lineEl.parentNode;
         else {
-            gotoline = apf.createNodeFromXpath(history.data, "gotoline");
+            gotoline = apf.createNodeFromXpath(history.data, "gotoline") 
             lineEl   = apf.getXml("<line nr='" + line + "' />");
         }
-
+        
         if (lineEl != gotoline.firstChild)
             apf.xmldb.appendChild(gotoline, lineEl, gotoline.firstChild);
 

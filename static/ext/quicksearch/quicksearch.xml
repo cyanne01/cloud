@@ -1,4 +1,8 @@
 <a:application xmlns:a="http://ajax.org/2005/aml">
+    <a:skin id="quicksearch" 
+      src       = "{require('ext/quicksearch/quicksearch').skin}" 
+      icon-path = "/static/ext/quicksearch/icons/" />
+
     <a:bar id="winQuickSearch"
       skinset = "quicksearch"
       visible = "false"
@@ -14,7 +18,6 @@
             <a:button margin="0 0 0 5" skin="btnsearchicon" icon="rounded_close.png" onclick="
               require('ext/quicksearch/quicksearch').toggleDialog(-1);
             " />
-            <div id="divSearchCount"><span class="searchIter" id="spanSearchIter">0</span><span class="searchTotal" id="spanSearchTotal">0</span></div>
         </a:hbox>
     </a:bar>
 </a:application>
