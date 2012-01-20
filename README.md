@@ -28,7 +28,7 @@ Documentation is in the making.
 
 ## Open Source Projects Used
 
-The Cloud9 PHP Editor couldn't be this cool if it weren't for the wildly productive [Cloud9 IDE](http://github.com/ajaxorg/cloud9) community producing so many high quality software.
+The Cloud9 PHP Editor couldn't be this cool if it weren't for the wildly productive [ajax.org] community producing so much high quality software.
 Main projects that we use as building blocks:
   
   * [HTTP_WebDAV_Server](http://pear.php.net/package/HTTP_WebDAV_Server) by [Hartmut Holzgraefe](mailto:hholzgra@php.net) and [Christian Stocker](mailto:chregu@bitflux.ch)
@@ -42,12 +42,7 @@ Thanks to all developers and contributors of these projects!
 [javruben]: http://github.com/javruben
 [mikedeboer]: http://github.com/mikedeboer
 [ajax.org]: http://www.ajax.org/
-[async.js]: http://github.com/fjakobs/async.js
-[jsDAV]: http://github.com/mikedeboer/jsdav
-[connect]: http://github.com/senchalabs/connect
-[socket.io]: http://github.com/LearnBoost/Socket.IO-node.git
 [requireJS]: http://requirejs.org/
-[Node.JS]: http://nodejs.org/
 
 ## License
 
