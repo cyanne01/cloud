@@ -2,7 +2,7 @@
 
 The Cloud9 PHP Code Editor is an open source project started by IAmACarpet, built out of the sources of Cloud9 IDE.
 
-This is designed to bring the look and feel of the amazing Cloud9 IDE project, with all the ease and usability of a PHP application.
+This is designed to bring the look and feel of the amazing [Cloud9 IDE](http://github.com/ajaxorg/cloud9) project, with all the ease and usability of a PHP application.
 
 The goal is for anyone to be able to install it in about 20 mins and be able to have a fully featured multi-user / multi-project environement ready to use.
 
@@ -28,7 +28,7 @@ Documentation is in the making.
 
 ## Open Source Projects Used
 
-The Cloud9 IDE couldn't be this cool if it weren't for the wildly productive [Node.JS] community producing so many high quality software.
+The Cloud9 PHP Editor couldn't be this cool if it weren't for the wildly productive [Cloud9 IDE](http://github.com/ajaxorg/cloud9) community producing so many high quality software.
 Main projects that we use as building blocks:
   
   * [Cloud9 IDE](http://github.com/ajaxorg/cloud9) by [ajax.org]
