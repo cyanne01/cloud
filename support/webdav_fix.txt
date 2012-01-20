@@ -1,0 +1,21 @@
+Fix for the PHP WebDAV server.
+
+if (!isset($this->_SERVER['PATH_INFO']) && isset($this->_SERVER['ORIG_PATH_INFO']))
+        {
+            $this->_SERVER['PATH_INFO'] = $this->_SERVER['ORIG_PATH_INFO'];
+        }
+        if ($this->_SERVER['PATH_INFO'] == ""){
+            $this->_SERVER['PATH_INFO'] = $this->_urldecode(substr($this->_SERVER['REQUEST_URI'], strlen('/workspace')));
+        }
+        //echo $this->_SERVER['PATH_INFO'] . "<br />";
+        // we cant use SCRIPT_NAME, because it fails, if there's any url rewriting
+        //echo "pathinfo:\n". $this->_urldecode($this->_SERVER['REQUEST_URI']).":\n".$this->_SERVER['PATH_INFO'];
+        $uri .= $this->_urldecode($this->_SERVER['REQUEST_URI']);
+        //echo $uri . "<br />";
+        if (!empty($this->_SERVER["PATH_INFO"]))
+        {
+            $uri = substr($uri,0,-strlen($this->_SERVER["PATH_INFO"]));
+        }
+        //echo $uri . "<br />";
+
+        $path_info = empty($this->_SERVER["PATH_INFO"]) ? "/" : $this->_SERVER["PATH_INFO"];
