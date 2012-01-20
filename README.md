@@ -31,14 +31,10 @@ Documentation is in the making.
 The Cloud9 PHP Editor couldn't be this cool if it weren't for the wildly productive [Cloud9 IDE](http://github.com/ajaxorg/cloud9) community producing so many high quality software.
 Main projects that we use as building blocks:
   
-  * [Cloud9 IDE](http://github.com/ajaxorg/cloud9) by [ajax.org]
-  * [async.js] by [fjakobs]
-  * [jsDAV] by [mikedeboer]
-  * [connect] by [senchalabs](http://github,com/senchalabs)
-  * [socket.io] by [LearnBoost](http://github.com/LearnBoost)
+  * [HTTP_WebDAV_Server](http://pear.php.net/package/HTTP_WebDAV_Server) by [Hartmut Holzgraefe](mailto:hholzgra@php.net) and [Christian Stocker](mailto:chregu@bitflux.ch)
   * [ace](http://github.com/ajaxorg/ace) by [fjakobs]
   * [apf](http://www.ajax.org) by [ajax.org]
-  * and of course [Node.JS]!
+  * and of course [Cloud9 IDE](http://github.com/ajaxorg/cloud9) by [ajax.org]!
   
 Thanks to all developers and contributors of these projects! 
 
