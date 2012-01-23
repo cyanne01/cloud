@@ -10,6 +10,12 @@ if ($_GET['pid']){
     $row = mysql_fetch_row($query) or die('Invalid Project ID');
 }
 
+$dir = str_replace('<%u%>', $cloud9->func->getCurrentUser(), $cloud9->conf->storage_location);
+
+if (!is_dir($dir . '/' . $row[1])){
+    mkdir($dir . '/' . $row[1], 755, true) or die('Project Dir Error');
+}
+
 $file = file_get_contents('view/ide.tmpl.html');
 
 $file = str_replace('[%offlineManifest%]', '', $file);
