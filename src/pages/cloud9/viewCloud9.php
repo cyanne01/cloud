@@ -4,6 +4,12 @@ if (!CLOUD9){
     exit();
 }
 
+if ($_GET['pid']){
+    $sql = "SELECT ID, ProjectName FROM projects WHERE UserID = '" . mysql_real_escape_string($_SESSION['userid']) . "' AND ID = '" . mysql_real_escape_string($_GET['pid']) . "'";
+    $query = mysql_query($sql, $cloud9->db->db_conn) or die('MySQL Error');
+    $row = mysql_fetch_row($query) or die('Invalid Project ID');
+}
+
 $file = file_get_contents('view/ide.tmpl.html');
 
 $file = str_replace('[%offlineManifest%]', '', $file);
@@ -14,7 +20,7 @@ if ($_GET['pid'] == 0 || $_GET['pid'] == ""){
     $file = str_replace('[%davPrefix%]', '"/workspace"', $file);
 } else {
     // Get project details here and find dir name...
-    $file = str_replace('[%davPrefix%]', '"/workspace/' . $projectDir . '"', $file);
+    $file = str_replace('[%davPrefix%]', '"/workspace/' . $row[1] . '"', $file);
 }
 $file = str_replace('[%workspaceDir%]', '""', $file);
 $file = str_replace('[%debug%]', 'false', $file);
@@ -24,7 +30,7 @@ $file = str_replace('[%workspaceId%]', '"ide"', $file);
 if ($_GET['pid'] == 0 || $_GET['pid'] == ""){
     $file = str_replace('[%name%]', "'Home Directory'", $file);
 } else {
-    $file = str_replace('[%name%]', "'My Project'", $file);
+    $file = str_replace('[%name%]', "'" . $row[1] . "'", $file);
 }
 
 $file = str_replace('[%readonly%]', '""', $file);
@@ -32,7 +38,7 @@ $file = str_replace('[%readonly%]', '""', $file);
 if ($_GET['pid'] == 0 || $_GET['pid'] == ""){
     $file = str_replace('[%projectName%]', "Home Directory", $file);
 } else {
-    $file = str_replace('[%projectName%]', "My Project", $file);
+    $file = str_replace('[%projectName%]', $row[1], $file);
 }
 $file = str_replace('[%version%]', '"0.1.0"', $file);
 

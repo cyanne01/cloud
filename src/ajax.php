@@ -4,9 +4,9 @@ define('CLOUD9', true);
 
 require "pages/init.php";
 
-$cloud9->checkAuthAJAX();
+$cloud9->func->checkAuthAJAX();
  
-switch ($_GET['p']){
+switch (@$_GET['p']){
     default:
         // ToDo - Error out here to say feature not implemented.
         break;

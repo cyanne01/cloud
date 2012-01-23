@@ -49,7 +49,7 @@ module.exports = ext.register("ext/offline/offline", {
      */
     init : function(){
         var _self   = this;
-        var offline = this.offline = new Offline("cloud9", "/static/ext/offline/ping.txt");
+        var offline = this.offline = new Offline("cloud9", "/pages/cloud9/ping.php");
         var sync    = this.sync    = new Sync("cloud9");
         
         // preload the offline image programmatically:
@@ -124,15 +124,15 @@ module.exports = ext.register("ext/offline/offline", {
         });
         
         // after the IDE connects (either initial or after reconnect)
-        ide.addEventListener("socketConnect", function (e) {
+        /*ide.addEventListener("socketConnect", function (e) {
             // load the state, which is quite a weird name actually, but it contains
             // info about the debugger. The response is handled by 'noderunner.js'
             // who publishes info for the UI of the debugging controls based on this.
-            ide.send(JSON.stringify({ 
+            (JSON.stringify({ 
                 command: "state", 
                 action: "publish" 
             }));
-        });
+        });*/
         
         /**** File System ****/
         /**

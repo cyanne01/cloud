@@ -13,6 +13,15 @@ require_once "inc/HTTP/WebDAV/Server/Filesystem.php";
 
 $server = new HTTP_WebDAV_Server_Filesystem();
 
-$server->ServeRequest(str_replace('<%u%>', $cloud9->func->getCurrentUser(), $cloud9->conf->storage_location));
+$dir = str_replace('<%u%>', $cloud9->func->getCurrentUser(), $cloud9->conf->storage_location);
+
+if ($dir != ""){
+    if (!is_dir($dir)){
+        mkdir($dir, 755, true);
+    }
+    $server->ServeRequest(str_replace('<%u%>', $cloud9->func->getCurrentUser(), $cloud9->conf->storage_location));
+} else {
+    die('Storage Location Error');
+}
 
 ?>

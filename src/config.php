@@ -29,7 +29,7 @@ class Config {
         // Storage Details
         // Note: "<%u%>" is replaced with the current users username.
         //------------------------
-        var $storge_location    =   '/home/workspace/<%u%>/';
+        var $storage_location   =   '/home/workspace/<%u%>/';
 }
 
 ?>
