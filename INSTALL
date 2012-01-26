@@ -1,0 +1,25 @@
+Since we've accumulated a few watchers of the project, I thought maybe a few people would be eager to give this a try.
+
+I will provide some instructions to get an environment up and running, but the project is still changing all the time so this is subject to change with new developments and this document may not always reflect the current codebase.
+
+BUT - Once everything is starting to look more finished and releasable, I will create an installer and release proper install instructions.
+
+For now -
+
+Copy everything in the src directory to your www_root for the project (don't forget the .htaccess if doing it from the command line).
+
+Create a database and import the sql script in the sql folder (this is designed for MySQL only).
+
+Just edit config.php in the www_root to reflect your DB settings.
+
+You should also edit the workspace folder location in there too - The comments should hopefully help explain it.
+It is designed so you can either have /home/workspace/<username>/
+Or to fit in with current users home structures - /home/<username>/cloud9workspace/ to work with existing system users.
+But don't forget, either the directory will need to already exist for each user, or we need to have permissions to create it and write to the contents - Our permissions are that of the user PHP runs as. 
+
+Adding users currently needs to be done manually through the database - To generate the encrypted passwords, use the tool at http://yoursite/pages/utils/password.html
+The "Salt String" goes into the PasswordSalt field in the DB, and the Password field in the DB is the "Password + Salt".
+
+Creating projects should work through the site, but deleting or editing them currently needs to be done through the DB.
+
+I'll open a Traq shortly for any issues.
