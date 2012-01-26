@@ -40,12 +40,12 @@ module.exports = ext.register("ext/noderunner/noderunner", {
         stDebugProcessRunning.addEventListener("deactivate", this.$onDebugProcessDeactivate.bind(this));
 
         ide.addEventListener("consolecommand.run", function(e) {
-            ide.send(JSON.stringify({
+            /*ide.send(JSON.stringify({
                 command: "internal-isfile",
                 argv: e.data.argv,
                 cwd: e.data.cwd,
                 sender: "noderunner"
-            }));
+            }));*/
             return false;
         });
     },

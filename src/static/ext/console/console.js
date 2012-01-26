@@ -118,7 +118,7 @@ module.exports = ext.register("ext/console/console", {
     },
 
     send : function(data) {
-        ide.send(data.line.replace(data.command,"").trim());
+        /*ide.send(data.line.replace(data.command,"").trim());*/
         return true;
     },
 
@@ -272,8 +272,8 @@ module.exports = ext.register("ext/console/console", {
                             if (ide.dispatchEvent(evtName, { data: data }) !== false) {
                                 if (!ide.onLine)
                                     this.write("Cannot execute command. You are currently offline.");
-                                else
-                                    ide.send(JSON.stringify(data));
+                                else {}
+                                    /*(JSON.stringify(data));*/
                             }
                         }
                     }
@@ -436,11 +436,11 @@ module.exports = ext.register("ext/console/console", {
             // the 'commandhints' command retreives a list of available commands
             // from all the server plugins, to support git auto-completion, for
             // example.
-            ide.send(JSON.stringify({
+            /*(JSON.stringify({
                 command: "commandhints",
                 argv: parser.argv,
                 cwd: this.getCwd()
-            }));
+            }));*/
         }
 
         var base = parser.argv[0];
@@ -540,14 +540,14 @@ module.exports = ext.register("ext/console/console", {
             if (ins.indexOf("PATH]") != -1 && lastSearch && lastSearch.line == val && lastSearch.matches.length == 1)
                 ins = lastSearch.matches[0].replace(lastSearch.base, "");
             if (ins.indexOf("PATH]") != -1) {
-                ide.send(JSON.stringify({
+                /*(JSON.stringify({
                     command: "internal-autocomplete",
                     line   : val,
                     textbox: textbox.id,
                     cursor : cursorPos,
                     argv   : parser.argv,
                     cwd    : this.getCwd()
-                }));
+                }));*/
             }
             else {
                 if (!!(cmds || commands)[base + ins])

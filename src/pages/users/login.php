@@ -2,6 +2,7 @@
     <head>
     	<title>Cloud9 PHP Project Manager - Login</title>
 		<link rel="stylesheet" href="css/1.css" type="text/css">
+        <link href='http://fonts.googleapis.com/css?family=Knewave' rel='stylesheet' type='text/css'>
 	</head>
 	<body>
 		<form action="<?= $cloud9->base_url ?>?p=dologin" method="post">
@@ -10,7 +11,7 @@
 				<td width="100%" height="100%" class="noprint" valign="middle">
 					<table width="500" height="250" cellspacing="1" cellpadding="1" class="box_blue" align="center">
 						<tr>
-							<td class="headblue2" align="center" width="5%" colspan="2">&nbsp;
+							<td class="headblue2" style="font-family: 'Knewave', cursive;" align="center" width="5%" colspan="2">&nbsp;
 								<b>Cloud9 PHP Editor Login</b>
 							</td>
 						</tr>

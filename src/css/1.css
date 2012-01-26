@@ -32,6 +32,29 @@ a:hover {
 	font-size: 12px;
 	font-family: helvetica, arial, verdana;
 }
+
+.headblues a {
+    font-weight: bold;
+	color: #457baf;
+	font-size: 12px;
+	font-family: helvetica, arial, verdana;
+}
+
+.headbluesnu {
+    font-weight: bold;
+	color: #457baf;
+	font-size: 12px;
+	font-family: helvetica, arial, verdana;
+}
+
+.headbluesnu a {
+    font-weight: bold;
+    text-decoration: none;
+	color: #457baf;
+	font-size: 12px;
+	font-family: helvetica, arial, verdana;
+}
+
 .headblue2 {
 	font-weight: bold;
 	color: #457baf;

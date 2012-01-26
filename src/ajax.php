@@ -7,6 +7,9 @@ require "pages/init.php";
 $cloud9->func->checkAuthAJAX();
  
 switch (@$_GET['p']){
+    case 'mainpage':    
+        require "pages/projects/mainpage.php";
+        break;
     case 'newproject':
         require "pages/projects/new.php";
         break;
