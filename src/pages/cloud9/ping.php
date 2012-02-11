@@ -2,6 +2,10 @@
 
 session_start();
 
-echo '1';
+if (!@$_SESSION['loggedin']){
+    die('0');
+} else {
+    die('1');
+}
 
 ?>
