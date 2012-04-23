@@ -159,6 +159,14 @@ class C9auth {
         }
     }
     
+    public function currFirstName(){
+        if ($this->is_loggedin()){
+            return $this->CI->session->userdata('fname');
+        } else {
+            return false;
+        }
+    }
+    
     public function currUsername(){
         if ($this->is_loggedin()){
             return $this->CI->session->userdata('username');

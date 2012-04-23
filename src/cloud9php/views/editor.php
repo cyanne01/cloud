@@ -11,7 +11,7 @@
         <link rel="stylesheet" type="text/css" href="/static/style/style.css" />
 
         <script type="text/javascript" src="/static/require.js"></script>
-        [%scripts%]
+        <?= $scripts ?>
         <script type="text/javascript">
         //<![CDATA[
 

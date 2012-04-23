@@ -9,6 +9,6 @@ class Home extends CI_Controller {
     }
 
     public function index(){
-        $this->load->view('ajax/home');
+        $this->load->view('ajax/home', array('fname' => $this->c9auth->currFirstName()));
 	}
 }
