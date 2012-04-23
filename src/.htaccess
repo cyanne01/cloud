@@ -13,7 +13,7 @@
     #This snippet prevents user access to the application folder
     #Submitted by: Fabdrol
     #Rename 'application' to your applications folder name.
-    RewriteCond %{REQUEST_URI} ^application.*
+    RewriteCond %{REQUEST_URI} ^cloud9php.*
     RewriteRule ^(.*)$ /index.php?/$1 [L]
 
     #Checks to see if the user is attempting to access a valid file,
