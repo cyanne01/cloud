@@ -13,7 +13,6 @@ The goal is for anyone to be able to install it in about 20 mins and be able to 
 ## Browser Support
 Being based on the Cloud9 IDE sources, we currently support Firefox and Chrome as they do, although the development is currently all taking place in Firefox with the help of Firebug.
 
-
 ## Installation
 
 Installating details will be added here once the project reaches a usable stage.
@@ -31,9 +30,10 @@ Documentation is in the making.
 The Cloud9 PHP Editor couldn't be this cool if it weren't for the wildly productive [ajax.org] community producing so much high quality software.
 Main projects that we use as building blocks:
   
-  * [HTTP_WebDAV_Server](http://pear.php.net/package/HTTP_WebDAV_Server) by [Hartmut Holzgraefe](mailto:hholzgra@php.net) and [Christian Stocker](mailto:chregu@bitflux.ch)
+  * [SabreDAV](code.google.com/p/sabredav/)
   * [ace](http://github.com/ajaxorg/ace) by [fjakobs]
   * [apf](http://www.ajax.org) by [ajax.org]
+  * [CodeIgniter](http://codeigniter.com)
   * and of course [Cloud9 IDE](http://github.com/ajaxorg/cloud9) by [ajax.org]!
   
 Thanks to all developers and contributors of these projects! 
