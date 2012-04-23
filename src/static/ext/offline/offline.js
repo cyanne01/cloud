@@ -49,7 +49,7 @@ module.exports = ext.register("ext/offline/offline", {
      */
     init : function(){
         var _self   = this;
-        var offline = this.offline = new Offline("cloud9", "/pages/cloud9/ping.php");
+        var offline = this.offline = new Offline("cloud9", "/ajax/editor/ping");
         var sync    = this.sync    = new Sync("cloud9");
         
         // preload the offline image programmatically:

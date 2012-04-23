@@ -1,0 +1,93 @@
+window.onlineimg = {};
+window.onlineimg.col = 'blue';
+
+function mediaSyncLoad(){
+	$('#onlineimg').popover({placement: 'bottom', title: '<div align="center">Waiting on Device</div>', content: '<div align="center">Currently Waiting for Device</div>'});
+    $.get("ajax.php?p=pingcheck", function (data){
+        var data1 = jQuery.parseJSON(data);
+        if (data1.session == 1){
+            if (data1.online == 1){
+                if (data1.alert == 1){
+                    $('#onlineimg').fadeOut().attr("src","images/icons/orange.png").stop(true,true).fadeIn();
+                    window.onlineimg.col = 'orange';
+                } else {
+                    $('#onlineimg').fadeOut().attr("src","images/icons/green.png").stop(true,true).fadeIn();
+                    window.onlineimg.col = 'green';
+                }
+                $('#onlineimg').popover({placement: 'bottom', title: '<div align="center">Device is Online</div>', content: '<div align="center"><b>Disk Usage</b><br />' + data1.disk + '<hr /><b>System Uptime</b><br />' + data1.uptime + '<br /><b>Load Average</b><br />' + data1.load + '</div>'});
+            } else {
+                $('#onlineimg').fadeOut().attr("src","images/icons/red.png").stop(true,true).fadeIn();
+                window.onlineimg.col = 'red';
+                $('#onlineimg').popover({placement: 'bottom', title: '<div align="center">Device is Offline</div>', content: '<div align="center"><b>Disk Usage</b><br />' + data1.disk + '</div>'});
+            }
+        } else {
+            $('#onlineimg').fadeOut().attr("src","images/icons/blue.png").stop(true,true).fadeIn();
+            window.onlineimg.col = 'blue';
+            $('#onlineimg').popover({placement: 'bottom', title: '<div align="center">Session Expired</div>', content: '<div align="center">Your Session is Invalid</div>'});
+        }
+    
+    });
+    loadContent('ajax.php?p=home');
+};
+
+window.setInterval(function(){
+  $.get("ajax.php?p=pingcheck", function (data){
+        var data1 = jQuery.parseJSON(data);
+        if (data1.session == 1){
+            if (data1.online == 1){
+                if (data1.alert == 1){
+                    if (window.onlineimg.col != 'orange'){
+                        $('#onlineimg').fadeOut().attr("src","images/icons/orange.png").stop(true,true).fadeIn();
+                        window.onlineimg.col = 'orange';
+                    }
+                } else {
+                    if (window.onlineimg.col != 'green'){
+                        $('#onlineimg').fadeOut().attr("src","images/icons/green.png").stop(true,true).fadeIn();
+                        window.onlineimg.col = 'green';
+                    }
+                }
+                $('#onlineimg').popover('hide');
+                $('#onlineimg').popover({placement: 'bottom', title: '<div align="center">Device is Online</div>', content: '<div align="center"><b>Disk Usage</b><br />' + data1.disk + '<hr /><b>System Uptime</b><br />' + data1.uptime + '<br /><b>Load Average</b><br />' + data1.load + '</div>'});
+            } else {
+                if (window.onlineimg.col != 'red'){
+                    $('#onlineimg').fadeOut().attr("src","images/icons/red.png").stop(true,true).fadeIn();
+                    window.onlineimg.col = 'red';
+                }
+                $('#onlineimg').popover('hide');
+                $('#onlineimg').popover({placement: 'bottom', title: '<div align="center">Device is Offline</div>', content: '<div align="center"><b>Disk Usage</b><br />' + data1.disk + '</div>'});
+            }
+        } else {
+            if (window.onlineimg.col != 'blue'){
+                $('#onlineimg').fadeOut().attr("src","images/icons/blue.png").stop(true,true).fadeIn();
+                window.onlineimg.col = 'blue';
+            }
+            $('#onlineimg').popover('hide');
+            $('#onlineimg').popover({placement: 'bottom', title: '<div align="center">Session Expired</div>', content: '<div align="center">Your Session is Invalid</div>'});
+        }
+        $('#serverload').html(data1.sload);
+    });
+}, 30000);
+
+function loadContent(url){
+	$("#content").html("<table width=\"98%\" cellspacing=\"1\" cellpadding=\"1\" class=\"box_blue\" align=\"center\"><tr><td class=\"headblue\" align=\"center\" valign=\"middle\" width=\"100%\" height=\"25\" colspan=\"2\">Invalid Request</td></tr></table>");
+	$("#content").hide();
+	$("#contentloading").show();
+    try {
+        piwikTracker.setCustomUrl(url);
+        piwikTracker.setDocumentTitle('Ajax Request');
+        piwikTracker.trackPageView();
+    } catch (err) {}
+	$.get(url, function (data){ $("#content").html(data); $("#contentloading").hide(); $("#content").show(); });
+};
+
+function loadContentPost(url, data){
+	$("#content").html("<table width=\"98%\" cellspacing=\"1\" cellpadding=\"1\" class=\"box_blue\" align=\"center\"><tr><td class=\"headblue\" align=\"center\" valign=\"middle\" width=\"100%\" height=\"25\" colspan=\"2\">Invalid Request</td></tr></table>");
+	$("#content").hide();
+	$("#contentloading").show();
+    try {
+        piwikTracker.setCustomUrl(url);
+        piwikTracker.setDocumentTitle('Ajax Post Request');
+        piwikTracker.trackPageView();
+    } catch (err) {}
+	$.post(url, data, function (data) { $("#content").html(data); $("#contentloading").hide(); $("#content").show(); });
+};

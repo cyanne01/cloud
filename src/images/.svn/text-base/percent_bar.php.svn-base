@@ -1,0 +1,24 @@
+<?php
+ 	if ( (!$_GET['h']) || ($_GET['h'] > 250) || ($_GET['h'] < 3) ){
+		$_GET['h'] = 10;
+	}
+	if ($_GET['per'] == 0){
+		$_GET['per'] = 1;
+	}
+	if ( (!$_GET['per']) || ($_GET['per'] > 100) || ($_GET['per'] < 0) ) {
+		$_GET['per'] = 100;
+	}
+    // returns a PNG graph from the $_GET['per'] variable
+    $per = imagecreate(302,$_GET['h']);
+    $background = imagecolorallocate($per, 0xFF, 0xFF, 0xFF);
+    $foreground = imagecolorallocate($per, 0x08, 0xA1, 0x08);
+    $border = imagecolorallocate($per, 0x99, 0x99, 0x99);
+    if ($_GET['per'] > 0)
+    {
+        $grad = imagecreatefrompng("grad.png");
+        $per2 = imagecopy($per, $grad, 1, 1, 0, 0, ($_GET['per'] * 3), ($_GET['h']-2));
+        imagerectangle($per, 0, 0, 301, ($_GET['h']-1), $border);
+    }
+    header("Content-type: image/png");
+	imagepng($per, NULL, 5);
+?>

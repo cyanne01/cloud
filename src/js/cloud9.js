@@ -1,3 +1,10 @@
+window.onlineimg = {};
+window.onlineimg.col = 'blue';
+
+function cloud9Load(){
+    loadContent('/ajax/home');
+};
+
 function loadContent(url){
 	$("#content").hide();
 	$("#contentloading").show();
