@@ -15,13 +15,13 @@
                         <div class="control-group">
                             <label class="control-label" for="pw1"><b>New Password :</b></label>
                             <div class="controls">
-                                <input type="text" class="input-xlarge" name="pw1" id="pw1">
+                                <input type="password" class="input-xlarge" name="pw1" id="pw1">
                             </div>
                         </div>
                         <div class="control-group">
                             <label class="control-label" for="pw2"><b>Confirm Password :</b></label>
                             <div class="controls">
-                                <input type="text" class="input-xlarge" name="pw2" id="pw2">
+                                <input type="password" class="input-xlarge" name="pw2" id="pw2">
                             </div>
                         </div>
                         <div class="control-group">
