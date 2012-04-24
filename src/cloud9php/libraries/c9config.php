@@ -18,7 +18,7 @@ class C9config {
     }
     
     public function checkWorkspaceDir(){
-        if (is_dir($this->currWorkspaceDir()){
+        if (is_dir($this->currWorkspaceDir())){
             return true;
         } else {
             if (mkdir($this->currWorkspaceDir(), 0755)){
