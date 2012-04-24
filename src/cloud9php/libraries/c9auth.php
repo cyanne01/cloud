@@ -530,7 +530,7 @@ class C9auth {
         
         $this->CI->db->update('users', array('Password' => $npw, 'PasswordSalt' => $newsalt), array('Username' => $username));
         
-        if ($this->db->affected_rows() > 0){
+        if ($this->CI->db->affected_rows() > 0){
             return true;
         } else {
             return false;
