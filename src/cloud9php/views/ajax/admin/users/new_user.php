@@ -50,5 +50,5 @@
         <h2>Help</h2><br />
         Please note that all fields except the email field are mandatory.<br />
         <br />
-        The password required is the users pass phrase, an option to add Yubikeys to the account will be presented once the account has been created.
+        The password required is the users pass phrase, an option to add Yubikeys to the account will be presented once the account has been created.<br />
 </div>
