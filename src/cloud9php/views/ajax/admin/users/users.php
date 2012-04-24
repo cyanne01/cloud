@@ -1,0 +1,1 @@
+<div align="center"><button class="btn-large btn-success" onClick="loadContent('/ajax/admin/users/create');">Add New User</button></div>

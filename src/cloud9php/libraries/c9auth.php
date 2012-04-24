@@ -45,6 +45,20 @@ class C9auth {
         }
     }
     
+    public function checkLoginAdminAJAX(){
+        if (!$this->is_admin()){
+            $this->CI->load->view('login/ajax_sess');
+            exit();
+        } else {
+            if ($this->CI->session->userdata('last_activity') < (time() - 300)){
+                if ($this->CI->session->userdata('yubikey')){
+                    $this->CI->session->set_userdata('yubikey', false);
+                }
+            }
+            return true;
+        }
+    }
+    
     public function checkYubikey(){
         if ($this->CI->session->userdata('yubikey')){
             return true;
@@ -552,10 +566,10 @@ class C9auth {
         }
 
         // Check if already logged in.
-        if($this->CI->session->userdata('username') == $user){
+        /* if($this->CI->session->userdata('username') == $user){
             // This user is already logged in.
             return false;
-        }
+        } */
         
         // Grab the users details from the table.
         $query = $this->CI->db->query("SELECT ID, Username, Password, PasswordSalt, YubiKey, YubiKeyRequired FROM users WHERE Username = " . $this->CI->db->escape($user) . " AND Disabled = 0");

@@ -5,6 +5,10 @@ function cloud9Load(){
     loadContent('/ajax/home');
 };
 
+function cloud9AdminLoad(){
+    loadContent('/ajax/admin/home');
+};
+
 function loadContent(url){
 	$("#content").hide();
 	$("#contentloading").show();
