@@ -39,9 +39,11 @@
                         <input type="text" class="input-xlarge" id="cpassword">
                     </div>
                 </div>
-                <div class="form-actions">
-                    <button class="btn btn-primary" onClick="loadContentPost('/ajax/admin/users/create', $('#auser').serialize());">Create User</button>
-                    <button class="btn">Cancel</button>
+                <div class="control-group">
+                    <div class="controls">
+                        <button class="btn btn-primary" onClick="loadContentPost('/ajax/admin/users/create', $('#auser').serialize());">Create User</button>
+                        <button class="btn">Cancel</button>
+                    </div>
                 </div>
             </fieldset>
         </form>
