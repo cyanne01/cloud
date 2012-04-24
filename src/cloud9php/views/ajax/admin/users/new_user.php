@@ -6,8 +6,8 @@
             <input type="text" class="input-xlarge" placeholder="Last Name...">
             <input type="text" class="input-xlarge" placeholder="Email Address...">
             <input type="text" class="input-xlarge" placeholder="Username...">
-            <input type="text" class="input-xlarge" placeholder="Password...">
-            <input type="text" class="input-xlarge" placeholder="Confirm Password...">
+            <input type="password" class="input-xlarge" placeholder="Password...">
+            <input type="password" class="input-xlarge" placeholder="Confirm Password...">
         </form>
         <button class="btn btn-primary" onClick="loadContentPost('/ajax/admin/users/create', $('#auser').serialize());">Create User</button>
         <button class="btn">Cancel</button>
