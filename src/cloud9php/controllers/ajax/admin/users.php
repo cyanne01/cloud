@@ -22,7 +22,8 @@ class Users extends CI_Controller {
         $this->form_validation->set_rules('lname', 'Last Name', 'required');
 
     	if ($this->form_validation->run() == FALSE){
-            $this->load->view('ajax/admin/users/new_user.php');
+            print_r($_POST);
+            $this->load->view('ajax/admin/users/new_user');
     	} else {
             if ($this->c9auth->create(@$_POST['username'], @$_POST['password'], @$_POST['email'], @$_POST['fname'], @$_POST['lname'])){
                 $this->load->view('ajax/admin/users/new_user_success');
