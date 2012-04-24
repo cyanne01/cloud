@@ -430,7 +430,7 @@ class C9auth {
             // Username already exists
             return false;
         } else {
-            if ($this->CI->db->insert('users', array('Username' => $user, 'Password' => 'temp', 'PasswordSalt' => 'temp', 'FirstName' => $firstname, 'LastName' => $lastname, 'EmailAddress' => $email, 'Enabled' => 1))){
+            if ($this->CI->db->insert('users', array('Username' => $user, 'Password' => 'temp', 'PasswordSalt' => 'temp', 'FirstName' => $firstname, 'LastName' => $lastname, 'EmailAddress' => $email, 'Disabled' => 0))){
                 // Ok, we've created the user - Grab the UserID and set the password.
                 
                 $user_id = $this->CI->db->insert_id();
@@ -488,7 +488,7 @@ class C9auth {
     
     public function disableUser($user_id){
         $this->CI->db->where(array('ID' => $user_id));
-        $this->CI->db->update('users', array('Enabled' => 0));
+        $this->CI->db->update('users', array('Disabled' => 1));
         
         if ($this->CI->db->affected_rows() > 0){
             return true;
@@ -499,7 +499,7 @@ class C9auth {
     
     public function enableUser($user_id){
         $this->CI->db->where(array('ID' => $user_id));
-        $this->CI->db->update('users', array('Enabled' => 1));
+        $this->CI->db->update('users', array('Disabled' => 0));
         
         if ($this->CI->db->affected_rows() > 0){
             return true;
