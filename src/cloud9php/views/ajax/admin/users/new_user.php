@@ -1,6 +1,6 @@
 <div class="row">
     <div class="span8">
-        <form class="form-horizontal" id="auser">
+        <form id="auser">
             <fieldset>
                 <legend><div align="center">Add New User</div></legend>
                 <div class="control-group">
