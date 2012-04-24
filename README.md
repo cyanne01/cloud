@@ -8,22 +8,21 @@ The goal is for anyone to be able to install it in about 20 mins and be able to 
 
 ## Features
 
-  * A list will be added here later.
+  * Multi-User Support
+  * Projects with their own editor.
+  * Tabbed editing
+  * No background processes required, runs right from your web server via PHP.
 
 ## Browser Support
 Being based on the Cloud9 IDE sources, we currently support Firefox and Chrome as they do, although the development is currently all taking place in Firefox with the help of Firebug.
 
 ## Installation
 
-Installating details will be added here once the project reaches a usable stage.
-    
-## Usage
-
-I'll add some details about usage here shortly.
+Please see the INSTALL file.
 
 ## Documentation
 
-Documentation is in the making. 
+Documentation is in the making.
 
 ## Open Source Projects Used
 

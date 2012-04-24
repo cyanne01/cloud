@@ -1,3 +1,13 @@
-The new project backend is based on CodeIgniter and as such, a lot has changed and the install process is a little different.
+The new backend is based on CodeIgniter.
 
-New instructions will be posted here soon.
+To install, copy the files inside the src directory to your web root.
+
+Create a MySQL database and run create.sql on it from the sql folder.
+
+Edit the cloud9php/config/database.php file and fill it with your MySQL settings.
+
+That's all set up.
+
+For the moment, there is no easy way to create a user to help you login.
+
+An install script is on the way and will be available soon.
