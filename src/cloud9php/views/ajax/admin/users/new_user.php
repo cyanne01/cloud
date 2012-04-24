@@ -11,6 +11,8 @@
         </form>
         <button class="btn btn-primary" onClick="loadContentPost('/ajax/admin/users/create', $('#auser').serialize());">Create User</button>
         <button class="btn">Cancel</button>
+        <br /><br />
+        <?php echo validation_errors(); ?>
     </div>
     <div class="span4">
         <h2>Help</h2><br />
