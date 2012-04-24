@@ -11,7 +11,7 @@ class Dashboard extends CI_Controller {
     public function index(){
         $this->load->model('system/systemdata');
         
-		$this->load->view('dashboard', array('fullname' => $this->c9auth->currFullName(), 'loadavg' => $this->systemdata->getLoad()));
+		$this->load->view('admin/dashboard', array('fullname' => $this->c9auth->currFullName(), 'loadavg' => $this->systemdata->getLoad()));
 	}
 }
 
