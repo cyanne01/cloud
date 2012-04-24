@@ -17,6 +17,18 @@ class C9config {
         return $this->getWorkspaceDir($this->CI->c9auth->currUsername());
     }
     
+    public function checkWorkspaceDir(){
+        if (is_dir($this->currWorkspaceDir()){
+            return true;
+        } else {
+            if (mkdir($this->currWorkspaceDir(), 0755)){
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+    
 }
 
 /* End of file */

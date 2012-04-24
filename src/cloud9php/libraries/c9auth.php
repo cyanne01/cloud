@@ -686,7 +686,7 @@ class C9auth {
             if ($this->is_admin()){
                 return true;
             } else {
-                $this->logout();
+                $this->logout(true);
                 return false;
             }
         } else {
@@ -713,11 +713,13 @@ class C9auth {
      * @access    public
      * @return    void
     **/
-    public function logout() {
+    public function logout($silent = false) {
         //Destroy session
         $this->CI->session->sess_destroy();
         
-        redirect('/login');
+        if (!$silent){
+            redirect('/login');
+        }
     }
 }
 

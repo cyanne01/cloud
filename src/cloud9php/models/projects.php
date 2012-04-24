@@ -24,15 +24,19 @@ class Projects extends CI_Model {
     }
     
     public function checkProjDir($projectid){
-        if ($this->isUsersProject($projectid, $this->c9auth->currUserID())){
-            if (is_dir($this->localProjDir($projectid))){
-                return true;
-            } else {
-                if (mkdir($this->localProjDir($projectid))){
+        if ($this->c9config->checkWorkspaceDir()){
+            if ($this->isUsersProject($projectid, $this->c9auth->currUserID())){
+                if (is_dir($this->localProjDir($projectid))){
                     return true;
                 } else {
-                    return false;
+                    if (mkdir($this->localProjDir($projectid), 0755)){
+                        return true;
+                    } else {
+                        return false;
+                    }
                 }
+            } else {
+                return false;
             }
         } else {
             return false;

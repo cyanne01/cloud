@@ -14,6 +14,8 @@ class Editor extends CI_Controller {
         $settings['projectName'] = 'Home Directory';
         $settings['cdone'] = true;
         
+        $this->c9config->checkWorkspaceDir();
+        
         $this->_showEditor($settings);
 	}
     
