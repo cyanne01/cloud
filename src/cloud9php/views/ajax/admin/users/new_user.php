@@ -2,12 +2,12 @@
     <div class="span8" align="center">
         <h1>Add New User</h1>
         <form class="well" id="auser">
-            <input type="text" class="input-xlarge" id="fname" placeholder="First Name...">
-            <input type="text" class="input-xlarge" id="lname" placeholder="Last Name...">
-            <input type="text" class="input-xlarge" id="email" placeholder="Email Address...">
-            <input type="text" class="input-xlarge" id="username" placeholder="Username...">
-            <input type="password" class="input-xlarge" id="password" placeholder="Password...">
-            <input type="password" class="input-xlarge" id="cpassword" placeholder="Confirm Password...">
+            <input type="text" class="input-xlarge" name="fname" placeholder="First Name...">
+            <input type="text" class="input-xlarge" name="lname" placeholder="Last Name...">
+            <input type="text" class="input-xlarge" name="email" placeholder="Email Address...">
+            <input type="text" class="input-xlarge" name="username" placeholder="Username...">
+            <input type="password" class="input-xlarge" name="password" placeholder="Password...">
+            <input type="password" class="input-xlarge" name="cpassword" placeholder="Confirm Password...">
         </form>
         <button class="btn btn-primary" onClick="loadContentPost('/ajax/admin/users/create', $('#auser').serialize());">Create User</button>
         <button class="btn">Cancel</button>
