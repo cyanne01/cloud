@@ -1,6 +1,6 @@
 <div class="row">
-    <div class="span12">
-        <form class="form-horizontal" id="auser" align="center">
+    <div class="span8">
+        <form class="form-horizontal" id="auser">
             <fieldset>
                 <legend><div align="center">Add New User</div></legend>
                 <div class="control-group">
@@ -46,4 +46,9 @@
             </fieldset>
         </form>
     </div>
+    <div class="span4">
+        <h2>Help</h2><br />
+        Please note that all fields except the email field are mandatory.<br />
+        <br />
+        The password required is the users pass phrase, an option to add Yubikeys to the account will be presented once the account has been created.
 </div>
