@@ -1,1 +1,1 @@
-<h1>Created New User Successfully</h1>
+<div align="center"><h1>Created New User Successfully</h1></div>

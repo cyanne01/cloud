@@ -1,1 +1,1 @@
-<h1>Failed to Create New User</h1>
+<div align="center"><h1>Failed to Create New User</h1></div>
