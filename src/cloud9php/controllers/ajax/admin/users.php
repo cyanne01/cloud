@@ -24,11 +24,22 @@ class Users extends CI_Controller {
     	if ($this->form_validation->run() == FALSE){
             $this->load->view('ajax/admin/users/new_user');
     	} else {
-            if ($this->c9auth->create(@$_POST['username'], @$_POST['password'], @$_POST['email'], @$_POST['fname'], @$_POST['lname'])){
-                $this->load->view('ajax/admin/users/new_user_success');
+            $u = $this->c9auth->create(@$_POST['username'], @$_POST['password'], @$_POST['email'], @$_POST['fname'], @$_POST['lname']);
+            if ($u != false){
+                $this->manage($u);
             } else {
                 $this->load->view('ajax/admin/users/new_user_fail');
             }
     	}
+    }
+    
+    public function manage($id = 0){
+        // User management page goes here..
+        if ($id > 0){
+            // We have a valid user ID to manage, well, one has been passed anyway..
+        } else {
+            // It's using the default for the function, so we got squat.
+            // Display an error, or possibly in the future, show a page to help the admin pick a user.
+        }
     }
 }
