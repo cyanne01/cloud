@@ -37,7 +37,7 @@ class Users extends CI_Controller {
         // User management page goes here..
         if ($id > 0){
             // We have a valid user ID to manage, well, one has been passed anyway..
-            $this->load->view('admin/ajax/users/manage', array('uid' => $id, $chpwd = false));
+            $this->load->view('ajax/admin/users/manage', array('uid' => $id, $chpwd = false));
         } else {
             // It's using the default for the function, so we got squat.
             // Display an error, or possibly in the future, show a page to help the admin pick a user.
