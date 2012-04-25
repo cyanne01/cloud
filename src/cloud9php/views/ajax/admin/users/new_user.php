@@ -6,8 +6,8 @@
             <input type="text" class="input-xlarge" id="lname" value="<?= set_value('lname') ?>" placeholder="Last Name...">
             <input type="text" class="input-xlarge" id="email" value="<?= set_value('email') ?>" placeholder="Email Address...">
             <input type="text" class="input-xlarge" id="username" value="<?= set_value('username') ?>" placeholder="Username...">
-            <input type="password" class="input-xlarge" id="password" placeholder="Password...">
-            <input type="password" class="input-xlarge" id="cpassword" placeholder="Confirm Password...">
+            <input type="password" class="input-xlarge" id="password" value="<?= set_value('password') ?>" placeholder="Password...">
+            <input type="password" class="input-xlarge" id="cpassword" value="<?= set_value('cpassword') ?>" placeholder="Confirm Password...">
         </form>
         <button class="btn btn-primary" onClick="loadContentPost('/ajax/admin/users/create', $('#auser').serialize());">Create User</button>
         <button class="btn">Cancel</button>

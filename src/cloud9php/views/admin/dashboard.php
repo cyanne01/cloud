@@ -5,6 +5,7 @@
         
 		<link rel="stylesheet" href="/css/bootstrap.min.css" type="text/css">
         <script src="/js/jquery-1.7.1.min.js"></script>
+        <script src="/js/jquery.iphone-switch.js"></script>
         <script src="/js/bootstrap.min.js"></script>
 		<script src="/js/cloud9.js"></script>
         
