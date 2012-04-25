@@ -2,12 +2,12 @@
     <div class="span8" align="center">
         <h1>Add New User</h1>
         <form class="well" id="auser">
-            <input type="text" class="input-xlarge" id="fname" value="<?= set_value('fname') ?>" placeholder="First Name...">
-            <input type="text" class="input-xlarge" id="lname" value="<?= set_value('lname') ?>" placeholder="Last Name...">
-            <input type="text" class="input-xlarge" id="email" value="<?= set_value('email') ?>" placeholder="Email Address...">
-            <input type="text" class="input-xlarge" id="username" value="<?= set_value('username') ?>" placeholder="Username...">
-            <input type="password" class="input-xlarge" id="password" value="<?= set_value('password') ?>" placeholder="Password...">
-            <input type="password" class="input-xlarge" id="cpassword" value="<?= set_value('cpassword') ?>" placeholder="Confirm Password...">
+            <input type="text" class="input-xlarge" name="fname" value="<?= set_value('fname') ?>" placeholder="First Name...">
+            <input type="text" class="input-xlarge" name="lname" value="<?= set_value('lname') ?>" placeholder="Last Name...">
+            <input type="text" class="input-xlarge" name="email" value="<?= set_value('email') ?>" placeholder="Email Address...">
+            <input type="text" class="input-xlarge" name="username" value="<?= set_value('username') ?>" placeholder="Username...">
+            <input type="password" class="input-xlarge" name="password" value="<?= set_value('password') ?>" placeholder="Password...">
+            <input type="password" class="input-xlarge" name="cpassword" value="<?= set_value('cpassword') ?>" placeholder="Confirm Password...">
         </form>
         <button class="btn btn-primary" onClick="loadContentPost('/ajax/admin/users/create', $('#auser').serialize());">Create User</button>
         <button class="btn">Cancel</button>
