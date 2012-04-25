@@ -17,9 +17,10 @@
         YubiKey Enabled
     </div>
     <div class="span6" align="left">
-        <script type="text/javascript">
-            $('#1').iphoneSwitch("on", function() { $('#ajax').load('on.html'); }, function() { $('#ajax').load('off.html'); }, {});
-        </script>
         <div id="l" style="float:left; width:120px;"></div>
+        
+        <script type="text/javascript">
+            $('#1').iphoneSwitch("on", function() { alert('on'); }, function() { alert('off'); }, {});
+        </script>
     </div>
 </div>
