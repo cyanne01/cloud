@@ -24,6 +24,11 @@ Please see the INSTALL file.
 
 Documentation is in the making.
 
+## Future Plans
+Want to take a look what we've got in the pipeline?
+Want to suggest something we do / add to the project?
+Take a look at our Wiki page here: http://wiki.infitialis.com/Apps:Cloud9PHP
+
 ## Open Source Projects Used
 
 The Cloud9 PHP Editor couldn't be this cool if it weren't for the wildly productive [ajax.org] community producing so much high quality software.
