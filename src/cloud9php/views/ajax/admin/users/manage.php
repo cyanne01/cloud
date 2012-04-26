@@ -20,13 +20,15 @@
         <input type="checkbox" id="yubienabled" />
         
         <script language="javascript">
-            $('input#yubienabled').iToggle({
-		        onClickOn: function(){
-			        $.get('/ajax/admin/users/yubienable/<?= $uid ?>/1');
-		        },
-		        onClickOff: function(){
-			        $.get('/ajax/admin/users/yubienable/<?= $uid ?>/0');
-		        }
+            $(document).ready(function() {
+                $('input#yubienabled').iToggle({
+		             onClickOn: function(){
+			            $.get('/ajax/admin/users/yubienable/<?= $uid ?>/1');
+		                },
+		            onClickOff: function(){
+			            $.get('/ajax/admin/users/yubienable/<?= $uid ?>/0');
+		            }
+                });
             });
         </script>
     </div>
