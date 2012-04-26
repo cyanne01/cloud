@@ -10,7 +10,7 @@
         <script src="/js/bootstrap.min.js"></script>
 		<script src="/js/cloud9.js"></script>
         
-        <link rel="stylesheet" href="css/my.css" type="text/css">
+        <link rel="stylesheet" href="/css/my.css" type="text/css">
         
         <style type="text/css">
             html, body {
@@ -54,7 +54,7 @@
         <div class="wrapper">
             <div class="container">
                 <div id="contentloading" style="position: fixed; top: 50%; left: 50%; margin-top: -130px; margin-left: -42.5px;" align="center">
-                    <img src="images/icons/loading.png" border="0" />
+                    <img src="/images/icons/loading.png" border="0" />
                 </div>
                 <div id="content" style="display: none; padding-top: 60px; margin-bottom: 100px">
                 </div>
