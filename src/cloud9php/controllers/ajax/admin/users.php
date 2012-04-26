@@ -43,4 +43,16 @@ class Users extends CI_Controller {
             // Display an error, or possibly in the future, show a page to help the admin pick a user.
         }
     }
+    
+    public function yubienable($uid = 0, $enable = 1){
+        if ($uid > 0){
+            if ($enable == 1){
+                $this->c9auth->enableYubiAuth($uid);
+            } else {
+                $this->c9auth->disableYubiAuth($uid);
+            }
+        } else {
+            // Invalid User ID - We'd better display and error here.
+        }
+    }
 }

@@ -17,10 +17,17 @@
         YubiKey Enabled
     </div>
     <div class="span6" align="left">
-        <div id="l" style="float:left; width:120px;"></div>
+        <input type="checkbox" id="yubienabled" />
         
-        <script type="text/javascript">
-            $('#1').iphoneSwitch("on", function() { alert('on'); }, function() { alert('off'); }, {});
+        <script language="javascript">
+            $('input#yubienabled').iToggle({
+		        onClickOn: function(){
+			        $.get('/ajax/admin/users/yubienable/<?= $uid ?>/1');
+		        },
+		        onClickOff: function(){
+			        $.get('/ajax/admin/users/yubienable/<?= $uid ?>/0');
+		        }
+            });
         </script>
     </div>
 </div>

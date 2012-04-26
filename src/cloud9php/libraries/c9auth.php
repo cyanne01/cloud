@@ -206,7 +206,7 @@ class C9auth {
     }
     
     // Disable Yubikey Auth for a user.
-    public function disabledYubiAuth($user_id){
+    public function disableYubiAuth($user_id){
         $this->CI->db->where(array('ID' => $user_id));
         $this->CI->db->update('users', array('YubiKey' => 0));
         
