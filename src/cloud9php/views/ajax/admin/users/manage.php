@@ -19,8 +19,8 @@
     <div class="span6" align="left">
         <input type="checkbox" id="yubienabled" />
         
-        <script type="text/javascript">
-            $('#yubienabled').iToggle({ onClickOn: function(){ $.get('/ajax/admin/users/yubienable/<?= $uid ?>/1'); }, onClickOff: function(){ $.get('/ajax/admin/users/yubienable/<?= $uid ?>/0'); } });
-        </script>
     </div>
 </div>
+<script type="text/javascript">
+    $('#yubienabled').iToggle({ onClickOn: function(){ $.get('/ajax/admin/users/yubienable/<?= $uid ?>/1'); }, onClickOff: function(){ $.get('/ajax/admin/users/yubienable/<?= $uid ?>/0'); } });
+</script>
