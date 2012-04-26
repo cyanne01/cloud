@@ -18,11 +18,11 @@
     </div>
     <div class="span6" align="left">
         <fieldset class="switchonoff">
-            <input type="radio" name="onoff" id="switchoff" class="off" />
-            <label for="switchon" id="switchon_label">Disabled</label>
+            <input type="radio" name="onoff" id="switchoff" onClick="$.get('/ajax/admin/users/yubienable/<?= $uid ?>/0');" class="off" <?= $yubienabled == 0 ? 'checked="checked"' : '' ?> />
+            <label for="switchon" id="switchon_label">Yes</label>
 
-            <input type="radio" name="onoff" id="switchon" class="on" checked="checked" />
-            <label for="switchoff" id="switchoff_label">Enabled</label>
+            <input type="radio" name="onoff" id="switchon" class="on" onClick="$.get('/ajax/admin/users/yubienable/<?= $uid ?>/1');" <?= $yubienabled == 1 ? 'checked="checked"' : '' ?> />
+            <label for="switchoff" id="switchoff_label">No</label>
         </fieldset>
     </div>
 </div>
