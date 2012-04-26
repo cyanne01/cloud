@@ -4,7 +4,7 @@
 		<title>Cloud9 PHP Editor - Admin</title>
         
 		<link rel="stylesheet" href="/css/bootstrap.min.css" type="text/css">
-        <link rel="stylesheet" href="/css/engage.itoggle-min.css" type="text/css">
+        <link rel="stylesheet" href="/css/engage.itoggle.css" type="text/css">
         <script src="/js/jquery-1.7.1.min.js"></script>
         <script src="/js/engage.itoggle-min.js"></script>
         <script src="/js/bootstrap.min.js"></script>
