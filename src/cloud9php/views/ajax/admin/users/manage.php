@@ -17,10 +17,12 @@
         YubiKey Enabled
     </div>
     <div class="span6" align="left">
-        <input type="checkbox" id="yubienabled" />
-        
+        <fieldset class="switchonoff">
+            <input type="radio" name="onoff" id="switchoff" class="off" />
+            <label for="switchon" id="switchon_label">Disabled</label>
+
+            <input type="radio" name="onoff" id="switchon" class="on" checked="checked" />
+            <label for="switchoff" id="switchoff_label">Enabled</label>
+        </fieldset>
     </div>
 </div>
-<script type="text/javascript">
-    $('#yubienabled').iToggle({ onClickOn: function(){ $.get('/ajax/admin/users/yubienable/<?= $uid ?>/1'); }, onClickOff: function(){ $.get('/ajax/admin/users/yubienable/<?= $uid ?>/0'); } });
-</script>
